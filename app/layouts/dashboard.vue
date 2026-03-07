@@ -9,14 +9,16 @@ const open = ref(false)
 const links = [[{
   label: 'Home',
   icon: 'i-lucide-house',
-  to: '/',
+  to: '/dashboard',
+  exact: true,
   onSelect: () => {
     open.value = false
   }
 }, {
   label: 'Inbox',
   icon: 'i-lucide-inbox',
-  to: '/inbox',
+  to: '/dashboard/inbox',
+  exact: true,
   badge: '4',
   onSelect: () => {
     open.value = false
@@ -24,38 +26,42 @@ const links = [[{
 }, {
   label: 'Customers',
   icon: 'i-lucide-users',
-  to: '/customers',
+  to: '/dashboard/customers',
+  exact: true,
   onSelect: () => {
     open.value = false
   }
 }, {
   label: 'Settings',
-  to: '/settings',
+  to: '/dashboard/settings',
   icon: 'i-lucide-settings',
   defaultOpen: true,
   type: 'trigger',
   children: [{
     label: 'General',
-    to: '/settings',
+    to: '/dashboard/settings',
     exact: true,
     onSelect: () => {
       open.value = false
     }
   }, {
     label: 'Members',
-    to: '/settings/members',
+    to: '/dashboard/settings/members',
+    exact: true,
     onSelect: () => {
       open.value = false
     }
   }, {
     label: 'Notifications',
-    to: '/settings/notifications',
+    to: '/dashboard/settings/notifications',
+    exact: true,
     onSelect: () => {
       open.value = false
     }
   }, {
     label: 'Security',
-    to: '/settings/security',
+    to: '/dashboard/settings/security',
+    exact: true,
     onSelect: () => {
       open.value = false
     }
@@ -116,14 +122,8 @@ onMounted(async () => {
 
 <template>
   <UDashboardGroup unit="rem">
-    <UDashboardSidebar
-      id="default"
-      v-model:open="open"
-      collapsible
-      resizable
-      class="bg-elevated/25"
-      :ui="{ footer: 'lg:border-t lg:border-default' }"
-    >
+    <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
+      :ui="{ footer: 'lg:border-t lg:border-default' }">
       <template #header="{ collapsed }">
         <TeamsMenu :collapsed="collapsed" />
       </template>
@@ -131,21 +131,9 @@ onMounted(async () => {
       <template #default="{ collapsed }">
         <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
 
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[0]"
-          orientation="vertical"
-          tooltip
-          popover
-        />
+        <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical" tooltip popover />
 
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[1]"
-          orientation="vertical"
-          tooltip
-          class="mt-auto"
-        />
+        <UNavigationMenu :collapsed="collapsed" :items="links[1]" orientation="vertical" tooltip class="mt-auto" />
       </template>
 
       <template #footer="{ collapsed }">
