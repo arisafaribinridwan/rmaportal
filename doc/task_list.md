@@ -1,23 +1,27 @@
 # Task List — RMA Claim System
 
 > Total: 32 Tasks | 8 Phases
-
+> Progress: 4 selesai, 2 partial, 26 belum dikerjakan
 ---
 
 ## Phase 1 — Foundation: Database & Auth
 
 - [x] **#1** Buat schema DB: `ProductModel`, `NotificationMaster`, `DefectMaster`
-  - Path: `server/database/schema/`
+  - Path: `server/database/schema/product-model.ts`, `notification-master.ts`,`defect-master.ts`
   - Export di `server/database/schema/index.ts`
+  - Termasuk Zod validation, FK constraints, indexes
 
 - [x] **#2** Buat schema DB: `Claim`, `ClaimPhoto`, `ClaimHistory`
-  - Path: `server/database/schema/`
+  - Path: `server/database/schema/claim.ts`, `claim-photo.ts`, `claim-history.ts`    
+  - FK ke `notificationMaster`, `productModel`, `vendor`, `defectMaster`
 
 - [x] **#3** Buat schema DB: `VendorClaim`, `VendorClaimItem`, `PhotoReview`, `SequenceGenerator`
-  - Path: `server/database/schema/`
+  - Path: `server/database/schema/vendor-claim.ts`, `vendor-claim-item.ts`, `photo-review.ts`, `sequence-generator.ts`
 
-- [x] **#4** Buat schema DB: Profile & tabel Better-Auth
+- [x] **#4** Buat schema DB: tabel Better-Auth
   - Path: `server/database/schema/auth.ts`
+  - Catatan: Profile field di-merge ke tabel `user` (bukan tabel terpisah)          
+  - Termasuk `user`, `session`, `account`, `verification` + business fields (`branch`, `role`, `isActive`, `banned`, dll.)
 
 - [ ] **#5** Setup Better-Auth server
   - Instal dependency `better-auth` (saat ini belum ada di package.json)
@@ -30,8 +34,6 @@
 
 - [ ] **#7** Buat halaman Login & Profile
   - `app/pages/login.vue` — form email + password
-  - `app/pages/profile.vue` — read-only profile, ganti password
-
 ---
 
 ## Phase 2 — Master Data Management
