@@ -38,8 +38,13 @@
 
 ## Phase 2 — Master Data Management
 
-- [ ] **#8** Setup shared infrastructure
-  - Error handler, Sequence generator, Layouts, SidebarNav, `useAuth` composable
+- [/] **#8** Setup shared infrastructure
+  - Error handler: `app/error.vue` sudah ada (generic), server-side error handler   
+  - Sequence generator service: schema ada, service belum                           
+  - Layouts: `app/layouts/dashboard.vue` & `app/layouts/cs.vue` ada (masih template Nuxt UI)                                                                            
+  - SidebarNav: ada tapi masih link template (Home, Inbox, Customers) — belum RMA-specific                                                                         
+  - `useAuth` composable: belum ada                                                 
+  - Constants/Types: `shared/utils/constants.ts` & `shared/types/database.ts` sudah lengkap
 - [ ] **#9** Vendor CRUD (Backend) — Controller/Service di `server/api/vendors`
 - [ ] **#10** Vendor CRUD (Frontend) — `app/pages/dashboard/master/vendor.vue`
 - [ ] **#11** Product Model CRUD (Backend)
