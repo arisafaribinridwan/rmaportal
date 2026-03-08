@@ -23,12 +23,12 @@
   - Catatan: Profile field di-merge ke tabel `user` (bukan tabel terpisah)          
   - Termasuk `user`, `session`, `account`, `verification` + business fields (`branch`, `role`, `isActive`, `banned`, dll.)
 
-- [ ] **#5** Setup Better-Auth server
+- [x] **#5** Setup Better-Auth server
   - Instal dependency `better-auth` (saat ini belum ada di package.json)
   - Buat `server/utils/auth.ts`, `app/utils/auth-client.ts`
   - Konfigurasi: session 7 hari, ratelimit, max 5 attempt, lock 15 menit
 
-- [ ] **#6** Buat auth middleware & route protection
+- [/] **#6** Buat auth middleware & route protection
   - `server/api/auth/[...all].ts`, `server/utils/auth-helpers.ts`
   - Middleware: `app/middleware/auth.global.ts`, CS, Dashboard
 
