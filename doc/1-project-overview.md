@@ -1,9 +1,4 @@
-# RMA CLAIM SYSTEM — PRODUCT REQUIREMENTS DOCUMENT (PRD)
-
-> **Status**: FINALIZED ✅
-> **Tech Stack**: Nuxt 4 (v4.3.1), Better-Auth (v1.5.4), Drizzle ORM, SQLite.
-
----
+# 1. PROJECT OVERVIEW
 
 ## 1. CORE TECH STACK & ARCHITECTURE
 - **Frontend/Backend**: Nuxt 4 (Composition API)
@@ -69,17 +64,21 @@
 - **Security**: Sanitasi filename, 5MB max upload, Role-based Route Middleware.
 - **Storage**: `./public/uploads/claims/` dengan 300x300px thumbnails via Sharp.
 
-## 6. GIT WORKFLOW
+## 6. Code Style Guidelines
 
-```
-Main branch:    main
-Feature branch: feature/feature-name
-Bugfix branch:  bugfix/bug-name
+- **Formatting**: 2-space indentation, LF line endings, no trailing whitespace
+- **Vue Components**: Use `<script setup lang="ts">` with Composition API
+- **Imports**: Relative imports only - Vue/Nuxt → third-party → local
+- **Database**: Drizzle ORM with SQLite, schemas in `/server/database/schema/`
+- **Validation**: Gunakan Zod schema validation yang tepat untuk setiap tipe API route http request (Runtime + Type-Safe Request Utils)
+- **Error Handling**: `createError()` with proper status codes in try/catch blocks
+- **File Naming**: PascalCase for components, camelCase for utils/composables
+- **Testing**: Vitest dengan `.test.ts` atau `.spec.ts` suffixes
 
-Commit message format:
-- feat:     Add feature X
-- fix:      Fix bug Y
-- docs:     Update documentation
-- refactor: Refactor module Z
-- test:     Add test for X
-```
+## 7. Separation of Concerns
+
+| Layer      | Tanggung Jawab                   | Tidak Boleh                   | Folder                         |
+| ---------- | -------------------------------- | ----------------------------- | ------------------------------ |
+| API Route  | HTTP, Auth, Validasi input dasar | Business logic, Query DB      | `server/api/*`                 |
+| Service    | Business logic, Koordinasi       | Query DB langsung, HTTP stuff | `server/services/*.service.ts` |
+| Repository | CRUD database                    | Business logic, Auth          | `server/repositories/*.repo.ts`|
