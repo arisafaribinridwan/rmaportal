@@ -20,6 +20,9 @@ importers:
       '@libsql/client':
         specifier: ^0.17.0
         version: 0.17.0
+      '@nuxt/fonts':
+        specifier: 0.14.0
+        version: 0.14.0(db0@0.3.4(@electric-sql/pglite@0.3.15)(@libsql/client@0.17.0)(drizzle-orm@0.45.1(@electric-sql/pglite@0.3.15)(@libsql/client@0.17.0)(@prisma/client@7.4.2(prisma@7.4.2(@types/react@19.2.14)(magicast@0.5.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(kysely@0.28.11)(mysql2@3.15.3)(postgres@3.4.7)(prisma@7.4.2(@types/react@19.2.14)(magicast@0.5.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(mysql2@3.15.3))(ioredis@5.9.3)(magicast@0.5.2)(vite@7.3.1(@types/node@25.3.5)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
       '@nuxt/ui':
         specifier: ^4.5.1
         version: 4.5.1(5d0ea6ba826772771b3a2281a1e56bfa)
