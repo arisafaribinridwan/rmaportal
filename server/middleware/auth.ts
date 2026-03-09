@@ -95,7 +95,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   if (rule) {
     // Protected route — enforce role-based access
-    await requireRole(event, rule.roles)
+    await requireRole(event, rule!.roles)
   } else {
     // API route with no explicit rule — require authentication at minimum
     await requireAuth(event)

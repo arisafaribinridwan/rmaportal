@@ -3,7 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Row } from '@tanstack/table-core'
-import type { Vendor } from '~/types/master'
+import type { ProductModel } from '~/types/master'
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
@@ -20,39 +20,39 @@ const columnFilters = ref([{
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
 
-const { data, status } = await useFetch<Vendor[]>('/api/master/vendors', {
+const { data, status } = await useFetch<ProductModel[]>('/api/master/product-models', {
   lazy: true
 })
 
 // Modals State
 const editModalOpen = ref(false)
 const deleteModalOpen = ref(false)
-const selectedVendor = ref<Vendor | null>(null)
+const selectedModel = ref<ProductModel | null>(null)
 
-function openEditModal(vendor: Vendor) {
-  selectedVendor.value = vendor
+function openEditModal(model: ProductModel) {
+  selectedModel.value = model
   editModalOpen.value = true
 }
 
-function openDeleteModal(vendor: Vendor) {
-  selectedVendor.value = vendor
+function openDeleteModal(model: ProductModel) {
+  selectedModel.value = model
   deleteModalOpen.value = true
 }
 
-function getRowItems(row: Row<Vendor>) {
+function getRowItems(row: Row<ProductModel>) {
   return [
     {
       type: 'label',
       label: 'Actions'
     },
     {
-      label: 'Copy vendor code',
+      label: 'Copy model name',
       icon: 'i-lucide-copy',
       onSelect() {
-        navigator.clipboard.writeText(row.original.code)
+        navigator.clipboard.writeText(row.original.name)
         toast.add({
           title: 'Copied to clipboard',
-          description: 'Vendor code copied to clipboard'
+          description: 'Model name copied to clipboard'
         })
       }
     },
@@ -60,7 +60,7 @@ function getRowItems(row: Row<Vendor>) {
       type: 'separator'
     },
     {
-      label: 'Edit vendor',
+      label: 'Edit model',
       icon: 'i-lucide-pencil',
       onSelect() {
         openEditModal(row.original)
@@ -70,7 +70,7 @@ function getRowItems(row: Row<Vendor>) {
       type: 'separator'
     },
     {
-      label: row.original.isActive ? 'Deactivate vendor' : 'Activate vendor',
+      label: row.original.isActive ? 'Deactivate model' : 'Activate model',
       icon: row.original.isActive ? 'i-lucide-trash' : 'i-lucide-check-circle',
       color: row.original.isActive ? 'error' : 'success',
       onSelect() {
@@ -80,7 +80,7 @@ function getRowItems(row: Row<Vendor>) {
   ]
 }
 
-const columns: TableColumn<Vendor>[] = [
+const columns: TableColumn<ProductModel>[] = [
   {
     id: 'select',
     header: ({ table }) =>
@@ -104,10 +104,6 @@ const columns: TableColumn<Vendor>[] = [
     header: 'ID'
   },
   {
-    accessorKey: 'code',
-    header: 'Code'
-  },
-  {
     accessorKey: 'name',
     header: ({ column }) => {
       const isSorted = column.getIsSorted()
@@ -115,7 +111,7 @@ const columns: TableColumn<Vendor>[] = [
       return h(UButton, {
         color: 'neutral',
         variant: 'ghost',
-        label: 'Name',
+        label: 'Model Name',
         icon: isSorted
           ? isSorted === 'asc'
             ? 'i-lucide-arrow-up-narrow-wide'
@@ -127,26 +123,13 @@ const columns: TableColumn<Vendor>[] = [
     }
   },
   {
-    accessorKey: 'requiredPhotos',
-    header: 'Required Photos',
-    cell: ({ row }) => {
-      const photos = row.original.requiredPhotos || []
-      if (!photos.length) return '-'
-      return h('div', { class: 'flex flex-wrap gap-1' },
-        photos.map(photo => h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' }, () => photo))
-      )
-    }
+    accessorKey: 'inch',
+    header: 'Inch'
   },
   {
-    accessorKey: 'requiredFields',
-    header: 'Required Fields',
-    cell: ({ row }) => {
-      const fields = row.original.requiredFields || []
-      if (!fields.length) return '-'
-      return h('div', { class: 'flex flex-wrap gap-1' },
-        fields.map(field => h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' }, () => field))
-      )
-    }
+    accessorKey: 'vendorName',
+    header: 'Vendor Name',
+    cell: ({ row }) => row.original.vendorName || row.original.vendorId
   },
   {
     accessorKey: 'isActive',
@@ -217,30 +200,30 @@ const pagination = ref({
 </script>
 
 <template>
-  <UDashboardPanel id="vendors">
+  <UDashboardPanel id="product-models">
     <template #header>
-      <UDashboardNavbar title="Vendors">
+      <UDashboardNavbar title="Product Models">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
-          <MasterVendorAddModal />
+          <MasterProductModelAddModal />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <!-- Remote Modals handled via state -->
-      <MasterVendorEditModal
-        v-if="selectedVendor"
+      <MasterProductModelEditModal
+        v-if="selectedModel"
         v-model:open="editModalOpen"
-        :vendor="selectedVendor"
+        :product-model="selectedModel"
       />
-      <MasterVendorDeleteModal
-        v-if="selectedVendor"
+      <MasterProductModelDeleteModal
+        v-if="selectedModel"
         v-model:open="deleteModalOpen"
-        :vendor="selectedVendor"
+        :product-model="selectedModel"
       />
 
       <div class="flex flex-wrap items-center justify-between gap-1.5">
@@ -248,7 +231,7 @@ const pagination = ref({
           v-model="name"
           class="max-w-sm"
           icon="i-lucide-search"
-          placeholder="Filter names..."
+          placeholder="Filter model names..."
         />
 
         <div class="flex flex-wrap items-center gap-1.5">

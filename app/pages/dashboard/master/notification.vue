@@ -3,7 +3,8 @@ import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Row } from '@tanstack/table-core'
-import type { Vendor } from '~/types/master'
+import type { NotificationMaster } from '~/types/master'
+import { format } from 'date-fns'
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
@@ -14,45 +15,45 @@ const toast = useToast()
 const table = useTemplateRef('table')
 
 const columnFilters = ref([{
-  id: 'name',
+  id: 'notificationCode',
   value: ''
 }])
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
 
-const { data, status } = await useFetch<Vendor[]>('/api/master/vendors', {
+const { data, status } = await useFetch<NotificationMaster[]>('/api/master/notifications', {
   lazy: true
 })
 
 // Modals State
 const editModalOpen = ref(false)
 const deleteModalOpen = ref(false)
-const selectedVendor = ref<Vendor | null>(null)
+const selectedNotification = ref<NotificationMaster | null>(null)
 
-function openEditModal(vendor: Vendor) {
-  selectedVendor.value = vendor
+function openEditModal(notification: NotificationMaster) {
+  selectedNotification.value = notification
   editModalOpen.value = true
 }
 
-function openDeleteModal(vendor: Vendor) {
-  selectedVendor.value = vendor
+function openDeleteModal(notification: NotificationMaster) {
+  selectedNotification.value = notification
   deleteModalOpen.value = true
 }
 
-function getRowItems(row: Row<Vendor>) {
+function getRowItems(row: Row<NotificationMaster>) {
   return [
     {
       type: 'label',
       label: 'Actions'
     },
     {
-      label: 'Copy vendor code',
+      label: 'Copy code',
       icon: 'i-lucide-copy',
       onSelect() {
-        navigator.clipboard.writeText(row.original.code)
+        navigator.clipboard.writeText(row.original.notificationCode)
         toast.add({
           title: 'Copied to clipboard',
-          description: 'Vendor code copied to clipboard'
+          description: 'Notification code copied to clipboard'
         })
       }
     },
@@ -60,7 +61,7 @@ function getRowItems(row: Row<Vendor>) {
       type: 'separator'
     },
     {
-      label: 'Edit vendor',
+      label: 'Edit notification',
       icon: 'i-lucide-pencil',
       onSelect() {
         openEditModal(row.original)
@@ -70,9 +71,10 @@ function getRowItems(row: Row<Vendor>) {
       type: 'separator'
     },
     {
-      label: row.original.isActive ? 'Deactivate vendor' : 'Activate vendor',
-      icon: row.original.isActive ? 'i-lucide-trash' : 'i-lucide-check-circle',
-      color: row.original.isActive ? 'error' : 'success',
+      label: 'Expire notification',
+      icon: 'i-lucide-trash',
+      color: 'error',
+      disabled: row.original.status === 'EXPIRED',
       onSelect() {
         openDeleteModal(row.original)
       }
@@ -80,7 +82,7 @@ function getRowItems(row: Row<Vendor>) {
   ]
 }
 
-const columns: TableColumn<Vendor>[] = [
+const columns: TableColumn<NotificationMaster>[] = [
   {
     id: 'select',
     header: ({ table }) =>
@@ -104,18 +106,14 @@ const columns: TableColumn<Vendor>[] = [
     header: 'ID'
   },
   {
-    accessorKey: 'code',
-    header: 'Code'
-  },
-  {
-    accessorKey: 'name',
+    accessorKey: 'notificationCode',
     header: ({ column }) => {
       const isSorted = column.getIsSorted()
 
       return h(UButton, {
         color: 'neutral',
         variant: 'ghost',
-        label: 'Name',
+        label: 'Notification Code',
         icon: isSorted
           ? isSorted === 'asc'
             ? 'i-lucide-arrow-up-narrow-wide'
@@ -127,35 +125,37 @@ const columns: TableColumn<Vendor>[] = [
     }
   },
   {
-    accessorKey: 'requiredPhotos',
-    header: 'Required Photos',
-    cell: ({ row }) => {
-      const photos = row.original.requiredPhotos || []
-      if (!photos.length) return '-'
-      return h('div', { class: 'flex flex-wrap gap-1' },
-        photos.map(photo => h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' }, () => photo))
-      )
-    }
+    accessorKey: 'notificationDate',
+    header: 'Date',
+    cell: ({ row }) => format(new Date(row.original.notificationDate), 'dd MMM yyyy')
   },
   {
-    accessorKey: 'requiredFields',
-    header: 'Required Fields',
-    cell: ({ row }) => {
-      const fields = row.original.requiredFields || []
-      if (!fields.length) return '-'
-      return h('div', { class: 'flex flex-wrap gap-1' },
-        fields.map(field => h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' }, () => field))
-      )
-    }
+    accessorKey: 'modelName',
+    header: 'Product Model',
+    cell: ({ row }) => row.original.modelName || row.original.modelId
   },
   {
-    accessorKey: 'isActive',
+    accessorKey: 'branch',
+    header: 'Branch'
+  },
+  {
+    accessorKey: 'vendorName',
+    header: 'Vendor Name',
+    cell: ({ row }) => row.original.vendorName || row.original.vendorId
+  },
+  {
+    accessorKey: 'status',
     header: 'Status',
     filterFn: 'equals',
     cell: ({ row }) => {
-      const isActive = row.original.isActive
-      return h(UBadge, { class: 'capitalize', variant: 'subtle', color: isActive ? 'success' : 'error' }, () =>
-        isActive ? 'Active' : 'Inactive'
+      const statusColor = {
+        NEW: 'success' as const,
+        USED: 'warning' as const,
+        EXPIRED: 'error' as const
+      }[row.original.status]
+
+      return h(UBadge, { class: 'capitalize', variant: 'subtle', color: statusColor }, () =>
+        row.original.status
       )
     }
   },
@@ -191,22 +191,22 @@ const statusFilter = ref('all')
 watch(() => statusFilter.value, (newVal) => {
   if (!table?.value?.tableApi) return
 
-  const statusColumn = table.value.tableApi.getColumn('isActive')
+  const statusColumn = table.value.tableApi.getColumn('status')
   if (!statusColumn) return
 
   if (newVal === 'all') {
     statusColumn.setFilterValue(undefined)
   } else {
-    statusColumn.setFilterValue(newVal === 'active')
+    statusColumn.setFilterValue(newVal)
   }
 })
 
-const name = computed({
+const codeSearch = computed({
   get: (): string => {
-    return (table.value?.tableApi?.getColumn('name')?.getFilterValue() as string) || ''
+    return (table.value?.tableApi?.getColumn('notificationCode')?.getFilterValue() as string) || ''
   },
   set: (value: string) => {
-    table.value?.tableApi?.getColumn('name')?.setFilterValue(value || undefined)
+    table.value?.tableApi?.getColumn('notificationCode')?.setFilterValue(value || undefined)
   }
 })
 
@@ -217,38 +217,38 @@ const pagination = ref({
 </script>
 
 <template>
-  <UDashboardPanel id="vendors">
+  <UDashboardPanel id="notifications">
     <template #header>
-      <UDashboardNavbar title="Vendors">
+      <UDashboardNavbar title="Notifications">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
-          <MasterVendorAddModal />
+          <MasterNotificationAddModal />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <!-- Remote Modals handled via state -->
-      <MasterVendorEditModal
-        v-if="selectedVendor"
+      <MasterNotificationEditModal
+        v-if="selectedNotification"
         v-model:open="editModalOpen"
-        :vendor="selectedVendor"
+        :notification="selectedNotification"
       />
-      <MasterVendorDeleteModal
-        v-if="selectedVendor"
+      <MasterNotificationDeleteModal
+        v-if="selectedNotification"
         v-model:open="deleteModalOpen"
-        :vendor="selectedVendor"
+        :notification="selectedNotification"
       />
 
       <div class="flex flex-wrap items-center justify-between gap-1.5">
         <UInput
-          v-model="name"
+          v-model="codeSearch"
           class="max-w-sm"
           icon="i-lucide-search"
-          placeholder="Filter names..."
+          placeholder="Filter notification codes..."
         />
 
         <div class="flex flex-wrap items-center gap-1.5">
@@ -256,8 +256,9 @@ const pagination = ref({
             v-model="statusFilter"
             :items="[
               { label: 'All', value: 'all' },
-              { label: 'Active', value: 'active' },
-              { label: 'Inactive', value: 'inactive' }
+              { label: 'New', value: 'NEW' },
+              { label: 'Used', value: 'USED' },
+              { label: 'Expired', value: 'EXPIRED' }
             ]"
             :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
             placeholder="Filter status"

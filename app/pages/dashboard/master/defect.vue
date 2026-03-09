@@ -3,7 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Row } from '@tanstack/table-core'
-import type { Vendor } from '~/types/master'
+import type { DefectMaster } from '~/types/master'
 
 const UButton = resolveComponent('UButton')
 const UBadge = resolveComponent('UBadge')
@@ -20,39 +20,39 @@ const columnFilters = ref([{
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
 
-const { data, status } = await useFetch<Vendor[]>('/api/master/vendors', {
+const { data, status } = await useFetch<DefectMaster[]>('/api/master/defects', {
   lazy: true
 })
 
 // Modals State
 const editModalOpen = ref(false)
 const deleteModalOpen = ref(false)
-const selectedVendor = ref<Vendor | null>(null)
+const selectedDefect = ref<DefectMaster | null>(null)
 
-function openEditModal(vendor: Vendor) {
-  selectedVendor.value = vendor
+function openEditModal(defect: DefectMaster) {
+  selectedDefect.value = defect
   editModalOpen.value = true
 }
 
-function openDeleteModal(vendor: Vendor) {
-  selectedVendor.value = vendor
+function openDeleteModal(defect: DefectMaster) {
+  selectedDefect.value = defect
   deleteModalOpen.value = true
 }
 
-function getRowItems(row: Row<Vendor>) {
+function getRowItems(row: Row<DefectMaster>) {
   return [
     {
       type: 'label',
       label: 'Actions'
     },
     {
-      label: 'Copy vendor code',
+      label: 'Copy defect code',
       icon: 'i-lucide-copy',
       onSelect() {
         navigator.clipboard.writeText(row.original.code)
         toast.add({
           title: 'Copied to clipboard',
-          description: 'Vendor code copied to clipboard'
+          description: 'Defect code copied to clipboard'
         })
       }
     },
@@ -60,7 +60,7 @@ function getRowItems(row: Row<Vendor>) {
       type: 'separator'
     },
     {
-      label: 'Edit vendor',
+      label: 'Edit defect',
       icon: 'i-lucide-pencil',
       onSelect() {
         openEditModal(row.original)
@@ -70,7 +70,7 @@ function getRowItems(row: Row<Vendor>) {
       type: 'separator'
     },
     {
-      label: row.original.isActive ? 'Deactivate vendor' : 'Activate vendor',
+      label: row.original.isActive ? 'Deactivate defect' : 'Activate defect',
       icon: row.original.isActive ? 'i-lucide-trash' : 'i-lucide-check-circle',
       color: row.original.isActive ? 'error' : 'success',
       onSelect() {
@@ -80,7 +80,7 @@ function getRowItems(row: Row<Vendor>) {
   ]
 }
 
-const columns: TableColumn<Vendor>[] = [
+const columns: TableColumn<DefectMaster>[] = [
   {
     id: 'select',
     header: ({ table }) =>
@@ -115,7 +115,7 @@ const columns: TableColumn<Vendor>[] = [
       return h(UButton, {
         color: 'neutral',
         variant: 'ghost',
-        label: 'Name',
+        label: 'Defect Name',
         icon: isSorted
           ? isSorted === 'asc'
             ? 'i-lucide-arrow-up-narrow-wide'
@@ -124,28 +124,6 @@ const columns: TableColumn<Vendor>[] = [
         class: '-mx-2.5',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
-    }
-  },
-  {
-    accessorKey: 'requiredPhotos',
-    header: 'Required Photos',
-    cell: ({ row }) => {
-      const photos = row.original.requiredPhotos || []
-      if (!photos.length) return '-'
-      return h('div', { class: 'flex flex-wrap gap-1' },
-        photos.map(photo => h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' }, () => photo))
-      )
-    }
-  },
-  {
-    accessorKey: 'requiredFields',
-    header: 'Required Fields',
-    cell: ({ row }) => {
-      const fields = row.original.requiredFields || []
-      if (!fields.length) return '-'
-      return h('div', { class: 'flex flex-wrap gap-1' },
-        fields.map(field => h(UBadge, { variant: 'subtle', color: 'neutral', size: 'sm' }, () => field))
-      )
     }
   },
   {
@@ -217,30 +195,30 @@ const pagination = ref({
 </script>
 
 <template>
-  <UDashboardPanel id="vendors">
+  <UDashboardPanel id="defects">
     <template #header>
-      <UDashboardNavbar title="Vendors">
+      <UDashboardNavbar title="Defects">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
-          <MasterVendorAddModal />
+          <MasterDefectAddModal />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <!-- Remote Modals handled via state -->
-      <MasterVendorEditModal
-        v-if="selectedVendor"
+      <MasterDefectEditModal
+        v-if="selectedDefect"
         v-model:open="editModalOpen"
-        :vendor="selectedVendor"
+        :defect="selectedDefect"
       />
-      <MasterVendorDeleteModal
-        v-if="selectedVendor"
+      <MasterDefectDeleteModal
+        v-if="selectedDefect"
         v-model:open="deleteModalOpen"
-        :vendor="selectedVendor"
+        :defect="selectedDefect"
       />
 
       <div class="flex flex-wrap items-center justify-between gap-1.5">
@@ -248,7 +226,7 @@ const pagination = ref({
           v-model="name"
           class="max-w-sm"
           icon="i-lucide-search"
-          placeholder="Filter names..."
+          placeholder="Filter defect names..."
         />
 
         <div class="flex flex-wrap items-center gap-1.5">
