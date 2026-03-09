@@ -10,11 +10,11 @@ const fields = [
     name: 'password',
     type: 'password',
     label: 'Password',
-    placeholder: 'Enter your password',
-    // In Nuxt UI v3/v4 this will render as text hint next to the label.
-    // We can also potentially use slots if supported, but this is the simplest built-in way.
-    description: 'Forget Password?'
+    placeholder: 'Enter your password'
   },
+  // In Nuxt UI v3/v4 this will render as text hint next to the label.
+  // We can also potentially use slots if supported, but this is the simplest built-in way.
+  // description: 'Forget Password?' },
   {
     name: 'remember',
     type: 'checkbox',
