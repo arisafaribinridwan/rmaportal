@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const id = Number(getRouterParam(event, 'id'))
 
   if (!id || isNaN(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid defect ID' })
+    throw createError({ statusCode: 400, message: 'Invalid defect ID' })
   }
 
   return defectMasterService.getById(id)

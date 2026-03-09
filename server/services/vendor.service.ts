@@ -16,7 +16,7 @@ export const vendorService = {
   async getById(id: number) {
     const record = await vendorRepo.findById(id)
     if (!record) {
-      throw createError({ statusCode: 404, statusMessage: 'Vendor not found' })
+      throw createError({ statusCode: 404, message: 'Vendor not found' })
     }
     return record
   },
@@ -33,7 +33,7 @@ export const vendorService = {
 
     const existing = await vendorRepo.findByCode(data.code)
     if (existing) {
-      throw createError({ statusCode: 409, statusMessage: `Vendor code '${data.code}' already exists` })
+      throw createError({ statusCode: 409, message: `Vendor code '${data.code}' already exists` })
     }
 
     return vendorRepo.create(data)
@@ -51,14 +51,14 @@ export const vendorService = {
     // Ensure vendor exists
     const existing = await vendorRepo.findById(id)
     if (!existing) {
-      throw createError({ statusCode: 404, statusMessage: 'Vendor not found' })
+      throw createError({ statusCode: 404, message: 'Vendor not found' })
     }
 
     // If code is being changed, check uniqueness
     if (data.code && data.code !== existing.code) {
       const duplicate = await vendorRepo.findByCode(data.code)
       if (duplicate) {
-        throw createError({ statusCode: 409, statusMessage: `Vendor code '${data.code}' already exists` })
+        throw createError({ statusCode: 409, message: `Vendor code '${data.code}' already exists` })
       }
     }
 
@@ -76,7 +76,7 @@ export const vendorService = {
 
     const existing = await vendorRepo.findById(id)
     if (!existing) {
-      throw createError({ statusCode: 404, statusMessage: 'Vendor not found' })
+      throw createError({ statusCode: 404, message: 'Vendor not found' })
     }
 
     return vendorRepo.updateStatus(id, data)

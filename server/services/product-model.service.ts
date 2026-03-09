@@ -16,7 +16,7 @@ export const productModelService = {
   async getById(id: number) {
     const record = await productModelRepo.findById(id)
     if (!record) {
-      throw createError({ statusCode: 404, statusMessage: 'Product model not found' })
+      throw createError({ statusCode: 404, message: 'Product model not found' })
     }
     return record
   },
@@ -33,7 +33,7 @@ export const productModelService = {
 
     const existing = await productModelRepo.findByNameAndVendor(data.name, data.vendorId)
     if (existing) {
-      throw createError({ statusCode: 409, statusMessage: `Product model '${data.name}' for this vendor already exists` })
+      throw createError({ statusCode: 409, message: `Product model '${data.name}' for this vendor already exists` })
     }
 
     return productModelRepo.create(data)
@@ -51,7 +51,7 @@ export const productModelService = {
     // Ensure product model exists
     const existing = await productModelRepo.findById(id)
     if (!existing) {
-      throw createError({ statusCode: 404, statusMessage: 'Product model not found' })
+      throw createError({ statusCode: 404, message: 'Product model not found' })
     }
 
     // Check uniqueness constraint if name or vendorId is being changed
@@ -61,7 +61,7 @@ export const productModelService = {
     if (newName !== existing.name || newVendorId !== existing.vendorId) {
       const duplicate = await productModelRepo.findByNameAndVendor(newName, newVendorId)
       if (duplicate && duplicate.id !== id) {
-        throw createError({ statusCode: 409, statusMessage: `Product model '${newName}' for this vendor already exists` })
+        throw createError({ statusCode: 409, message: `Product model '${newName}' for this vendor already exists` })
       }
     }
 
@@ -79,7 +79,7 @@ export const productModelService = {
 
     const existing = await productModelRepo.findById(id)
     if (!existing) {
-      throw createError({ statusCode: 404, statusMessage: 'Product model not found' })
+      throw createError({ statusCode: 404, message: 'Product model not found' })
     }
 
     return productModelRepo.updateStatus(id, data)

@@ -24,7 +24,7 @@ export async function requireAuth(event: H3Event) {
   if (!session) {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized — Please log in to access this resource'
+      message: 'Unauthorized — Please log in to access this resource'
     })
   }
 
@@ -48,7 +48,7 @@ export async function requireRole(event: H3Event, roles: UserRole[]) {
   if (!user.isActive) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'Forbidden — User account is inactive'
+      message: 'Forbidden — User account is inactive'
     })
   }
 
@@ -56,7 +56,7 @@ export async function requireRole(event: H3Event, roles: UserRole[]) {
   if (!userRole || !roles.includes(userRole)) {
     throw createError({
       statusCode: 403,
-      statusMessage: `Forbidden — Required role: ${roles.join(' or ')}`
+      message: `Forbidden — Required role: ${roles.join(' or ')}`
     })
   }
 

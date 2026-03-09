@@ -21,7 +21,7 @@ export const notificationMasterService = {
   async getById(id: number) {
     const record = await notificationMasterRepo.findById(id)
     if (!record) {
-      throw createError({ statusCode: 404, statusMessage: 'Notification not found' })
+      throw createError({ statusCode: 404, message: 'Notification not found' })
     }
     return record
   },
@@ -38,7 +38,7 @@ export const notificationMasterService = {
 
     const existing = await notificationMasterRepo.findByCode(data.notificationCode)
     if (existing) {
-      throw createError({ statusCode: 409, statusMessage: `Notification code '${data.notificationCode}' already exists` })
+      throw createError({ statusCode: 409, message: `Notification code '${data.notificationCode}' already exists` })
     }
 
     return notificationMasterRepo.create(data)
@@ -55,7 +55,7 @@ export const notificationMasterService = {
 
     const existing = await notificationMasterRepo.findById(id)
     if (!existing) {
-      throw createError({ statusCode: 404, statusMessage: 'Notification not found' })
+      throw createError({ statusCode: 404, message: 'Notification not found' })
     }
 
     return notificationMasterRepo.update(id, data)
@@ -72,7 +72,7 @@ export const notificationMasterService = {
 
     const existing = await notificationMasterRepo.findById(id)
     if (!existing) {
-      throw createError({ statusCode: 404, statusMessage: 'Notification not found' })
+      throw createError({ statusCode: 404, message: 'Notification not found' })
     }
 
     return notificationMasterRepo.updateStatus(id, data)
