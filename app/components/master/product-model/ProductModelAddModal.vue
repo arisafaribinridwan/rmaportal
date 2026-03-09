@@ -32,16 +32,35 @@ const vendorOptions = computed(() => {
   }))
 })
 
+function resetState() {
+  state.name = ''
+  state.inch = 0
+  state.vendorId = undefined
+  state.isActive = true
+}
+
+function onClose() {
+  resetState()
+  open.value = false
+}
+
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   // TODO: integrate with actual API
   toast.add({ title: 'Success', description: `Product Model ${event.data.name} created`, color: 'success' })
+  resetState()
   open.value = false
 }
 </script>
 
 <template>
-  <UModal v-model:open="open" title="New Product Model" description="Add a new product model to the master data">
+  <UModal
+    v-model:open="open"
+    title="New Product Model"
+    description="Add a new product model to the master data"
+    :dismissible="false"
+    @update:open="(val: boolean) => { if (!val) onClose() }"
+  >
     <UButton
       label="New model"
       icon="i-lucide-plus"
@@ -87,7 +106,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             label="Cancel"
             color="neutral"
             variant="subtle"
-            @click="open = false"
+            @click="onClose"
           />
           <UButton
             label="Create"

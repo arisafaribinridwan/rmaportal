@@ -37,6 +37,19 @@ watch(() => props.vendor, (newVal) => {
   }
 }, { deep: true })
 
+function resetState() {
+  state.code = props.vendor.code
+  state.name = props.vendor.name
+  state.requiredPhotos = props.vendor.requiredPhotos || []
+  state.requiredFields = props.vendor.requiredFields || []
+  state.isActive = props.vendor.isActive
+}
+
+function onClose() {
+  resetState()
+  open.value = false
+}
+
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   // TODO: integrate with actual API
@@ -49,7 +62,13 @@ const fieldOptions = ['odfNumber', 'version', 'serialNumber', 'purchaseDate', 's
 </script>
 
 <template>
-  <UModal v-model:open="open" title="Edit Vendor" description="Update vendor information">
+  <UModal
+    v-model:open="open"
+    title="Edit Vendor"
+    description="Update vendor information"
+    :dismissible="false"
+    @update:open="(val: boolean) => { if (!val) onClose() }"
+  >
     <slot />
 
     <template #body>
@@ -96,7 +115,7 @@ const fieldOptions = ['odfNumber', 'version', 'serialNumber', 'purchaseDate', 's
             label="Cancel"
             color="neutral"
             variant="subtle"
-            @click="open = false"
+            @click="onClose"
           />
           <UButton
             label="Save Changes"

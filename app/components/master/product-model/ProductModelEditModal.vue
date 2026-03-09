@@ -45,6 +45,18 @@ const vendorOptions = computed(() => {
   }))
 })
 
+function resetState() {
+  state.name = props.productModel.name
+  state.inch = props.productModel.inch
+  state.vendorId = props.productModel.vendorId
+  state.isActive = props.productModel.isActive
+}
+
+function onClose() {
+  resetState()
+  open.value = false
+}
+
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   // TODO: integrate with actual API
@@ -54,7 +66,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UModal v-model:open="open" title="Edit Product Model" description="Update product model information">
+  <UModal
+    v-model:open="open"
+    title="Edit Product Model"
+    description="Update product model information"
+    :dismissible="false"
+    @update:open="(val: boolean) => { if (!val) onClose() }"
+  >
     <slot />
 
     <template #body>
@@ -90,7 +108,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             label="Cancel"
             color="neutral"
             variant="subtle"
-            @click="open = false"
+            @click="onClose"
           />
           <UButton
             label="Save Changes"

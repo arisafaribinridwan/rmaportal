@@ -18,16 +18,34 @@ const state = reactive<Partial<Schema>>({
   isActive: true
 })
 
+function resetState() {
+  state.code = ''
+  state.name = ''
+  state.isActive = true
+}
+
+function onClose() {
+  resetState()
+  open.value = false
+}
+
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   // TODO: integrate with actual API
   toast.add({ title: 'Success', description: `Defect ${event.data.name} created`, color: 'success' })
+  resetState()
   open.value = false
 }
 </script>
 
 <template>
-  <UModal v-model:open="open" title="New Defect" description="Add a new defect to the master data">
+  <UModal
+    v-model:open="open"
+    title="New Defect"
+    description="Add a new defect to the master data"
+    :dismissible="false"
+    @update:open="(val: boolean) => { if (!val) onClose() }"
+  >
     <UButton
       label="New defect"
       icon="i-lucide-plus"
@@ -59,7 +77,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             label="Cancel"
             color="neutral"
             variant="subtle"
-            @click="open = false"
+            @click="onClose"
           />
           <UButton
             label="Create"

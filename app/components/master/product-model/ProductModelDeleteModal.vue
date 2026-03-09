@@ -21,6 +21,7 @@ async function onSubmit() {
     v-model:open="open"
     :title="productModel?.isActive ? 'Deactivate Product Model' : 'Activate Product Model'"
     :description="productModel?.isActive ? `Are you sure you want to deactivate ${productModel?.name}? This action works as a soft delete.` : `Are you sure you want to activate ${productModel?.name}?`"
+    :dismissible="false"
   >
     <slot />
 

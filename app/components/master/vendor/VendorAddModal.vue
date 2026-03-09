@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import { PHOTO_TYPES, FIELD_NAMES } from '~~/shared/utils/constants'
 
 const schema = z.object({
   code: z.string().min(1, 'Vendor code is required'),
   name: z.string().min(2, 'Vendor name is required'),
-  requiredPhotos: z.array(z.string()).default([]),
-  requiredFields: z.array(z.string()).default([]),
+  requiredPhotos: z.array(z.enum(PHOTO_TYPES)).default([]),
+  requiredFields: z.array(z.enum(FIELD_NAMES)).default([]),
   isActive: z.boolean().default(true)
 })
 
@@ -22,19 +23,39 @@ const state = reactive<Partial<Schema>>({
   isActive: true
 })
 
+function resetState() {
+  state.code = ''
+  state.name = ''
+  state.requiredPhotos = []
+  state.requiredFields = []
+  state.isActive = true
+}
+
+function onClose() {
+  resetState()
+  open.value = false
+}
+
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   // TODO: integrate with actual API
   toast.add({ title: 'Success', description: `Vendor ${event.data.name} created`, color: 'success' })
+  resetState()
   open.value = false
 }
 
-const photoOptions = ['CLAIM', 'ODF', 'UNIT', 'PACKAGING', 'ACCESSORY']
-const fieldOptions = ['odfNumber', 'version', 'serialNumber', 'purchaseDate', 'storeName']
+const photoOptions = [...PHOTO_TYPES]
+const fieldOptions = [...FIELD_NAMES]
 </script>
 
 <template>
-  <UModal v-model:open="open" title="New Vendor" description="Add a new vendor to the master data">
+  <UModal
+    v-model:open="open"
+    title="New Vendor"
+    description="Add a new vendor to the master data"
+    :dismissible="false"
+    @update:open="(val: boolean) => { if (!val) onClose() }"
+  >
     <UButton
       label="New vendor"
       icon="i-lucide-plus"
@@ -86,7 +107,7 @@ const fieldOptions = ['odfNumber', 'version', 'serialNumber', 'purchaseDate', 's
             label="Cancel"
             color="neutral"
             variant="subtle"
-            @click="open = false"
+            @click="onClose"
           />
           <UButton
             label="Create"

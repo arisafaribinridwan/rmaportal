@@ -47,16 +47,37 @@ const modelOptions = computed(() => {
 
 const statusOptions = ['NEW', 'USED', 'EXPIRED']
 
+function resetState() {
+  state.notificationCode = ''
+  state.notificationDate = new Date().toISOString().split('T')[0]
+  state.modelId = undefined
+  state.branch = ''
+  state.vendorId = undefined
+  state.status = 'NEW'
+}
+
+function onClose() {
+  resetState()
+  open.value = false
+}
+
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   // TODO: integrate with actual API
   toast.add({ title: 'Success', description: `Notification ${event.data.notificationCode} created`, color: 'success' })
+  resetState()
   open.value = false
 }
 </script>
 
 <template>
-  <UModal v-model:open="open" title="New Notification" description="Add a new notification to the master data">
+  <UModal
+    v-model:open="open"
+    title="New Notification"
+    description="Add a new notification to the master data"
+    :dismissible="false"
+    @update:open="(val: boolean) => { if (!val) onClose() }"
+  >
     <UButton
       label="New notification"
       icon="i-lucide-plus"
@@ -114,7 +135,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             label="Cancel"
             color="neutral"
             variant="subtle"
-            @click="open = false"
+            @click="onClose"
           />
           <UButton
             label="Create"

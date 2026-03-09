@@ -21,6 +21,7 @@ async function onSubmit() {
     v-model:open="open"
     title="Expire Notification"
     :description="`Are you sure you want to expire notification ${notification?.notificationCode}? This action works as a soft delete.`"
+    :dismissible="false"
   >
     <slot />
 

@@ -21,6 +21,7 @@ async function onSubmit() {
     v-model:open="open"
     :title="defect?.isActive ? 'Deactivate Defect' : 'Activate Defect'"
     :description="defect?.isActive ? `Are you sure you want to deactivate ${defect?.name}? This action works as a soft delete.` : `Are you sure you want to activate ${defect?.name}?`"
+    :dismissible="false"
   >
     <slot />
 

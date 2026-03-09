@@ -31,6 +31,17 @@ watch(() => props.defect, (newVal) => {
   }
 }, { deep: true })
 
+function resetState() {
+  state.code = props.defect.code
+  state.name = props.defect.name
+  state.isActive = props.defect.isActive
+}
+
+function onClose() {
+  resetState()
+  open.value = false
+}
+
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   // TODO: integrate with actual API
@@ -40,7 +51,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UModal v-model:open="open" title="Edit Defect" description="Update defect information">
+  <UModal
+    v-model:open="open"
+    title="Edit Defect"
+    description="Update defect information"
+    :dismissible="false"
+    @update:open="(val: boolean) => { if (!val) onClose() }"
+  >
     <slot />
 
     <template #body>
@@ -67,7 +84,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             label="Cancel"
             color="neutral"
             variant="subtle"
-            @click="open = false"
+            @click="onClose"
           />
           <UButton
             label="Save Changes"
