@@ -7,7 +7,7 @@ const toast = useToast()
 const open = ref(false)
 
 const links = [[{
-  label: 'Home',
+  label: 'Dashboard',
   icon: 'i-lucide-house',
   to: '/dashboard',
   exact: true,
@@ -15,52 +15,85 @@ const links = [[{
     open.value = false
   }
 }, {
-  label: 'Inbox',
-  icon: 'i-lucide-inbox',
-  to: '/dashboard/inbox',
-  exact: true,
-  badge: '4',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Customers',
-  icon: 'i-lucide-users',
-  to: '/dashboard/customers',
+  label: 'Claims',
+  icon: 'i-lucide-clipboard-list',
+  to: '/dashboard/claims',
   exact: true,
   onSelect: () => {
     open.value = false
   }
 }, {
-  label: 'Settings',
-  to: '/dashboard/settings',
-  icon: 'i-lucide-settings',
-  defaultOpen: true,
+  label: 'Vendor Claims',
+  icon: 'i-lucide-package',
+  to: '/dashboard/vendor-claims',
+  exact: true,
+  onSelect: () => {
+    open.value = false
+  }
+}, {
+  label: 'Master Data',
+  icon: 'i-lucide-database',
   type: 'trigger',
   children: [{
-    label: 'General',
-    to: '/dashboard/settings',
+    label: 'Vendor',
+    to: '/dashboard/master/vendor',
     exact: true,
     onSelect: () => {
       open.value = false
     }
   }, {
-    label: 'Members',
-    to: '/dashboard/settings/members',
+    label: 'Product Model',
+    to: '/dashboard/master/product-model',
     exact: true,
     onSelect: () => {
       open.value = false
     }
   }, {
-    label: 'Notifications',
-    to: '/dashboard/settings/notifications',
+    label: 'Notification',
+    to: '/dashboard/master/notification',
+    exact: true,
+    onSelect: () => {
+      open.value = false
+    }
+  }, {
+    label: 'Defect Master',
+    to: '/dashboard/master/defect',
+    exact: true,
+    onSelect: () => {
+      open.value = false
+    }
+  }]
+}, {
+  label: 'Reports',
+  icon: 'i-lucide-pie-chart',
+  to: '/dashboard/reports',
+  exact: true,
+  onSelect: () => {
+    open.value = false
+  }
+}, {
+  label: 'Audit Trail',
+  icon: 'i-lucide-history',
+  to: '/dashboard/audit-trail',
+  exact: true,
+  onSelect: () => {
+    open.value = false
+  }
+}, {
+  label: 'Setting',
+  to: '/dashboard/setting',
+  icon: 'i-lucide-settings',
+  type: 'trigger',
+  children: [{
+    label: 'Users',
+    to: '/dashboard/setting/users',
     exact: true,
     onSelect: () => {
       open.value = false
     }
   }, {
     label: 'Security',
-    to: '/dashboard/settings/security',
+    to: '/dashboard/setting/security',
     exact: true,
     onSelect: () => {
       open.value = false
@@ -131,7 +164,13 @@ onMounted(async () => {
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">
-        <TeamsMenu :collapsed="collapsed" />
+        <img
+          v-if="collapsed"
+          src="/icon.png"
+          alt="Icon"
+          class="h-5 w-auto mx-auto"
+        >
+        <AppLogo v-else />
       </template>
 
       <template #default="{ collapsed }">
