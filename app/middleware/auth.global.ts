@@ -5,6 +5,9 @@
 import { useAuth } from '~/composables/useAuth'
 
 export default defineNuxtRouteMiddleware(async (to) => {
+  // disable middleware sementara untuk fix ui dulu
+  return
+
   // Skip di server-side untuk menghindari hydration mismatch
   if (import.meta.server) return
 

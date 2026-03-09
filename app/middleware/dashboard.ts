@@ -38,6 +38,9 @@ const ROUTE_ACCESS: { pattern: string, roles: UserRole[] }[] = [
 ]
 
 export default defineNuxtRouteMiddleware((to) => {
+  // disable middleware sementara untuk fix ui dulu
+  return
+
   if (import.meta.server) return
 
   const { role, getHomePath } = useAuth()

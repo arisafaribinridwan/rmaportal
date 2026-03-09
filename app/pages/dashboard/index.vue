@@ -8,11 +8,11 @@ const { isNotificationsSlideoverOpen } = useDashboard()
 const items = [[{
   label: 'New mail',
   icon: 'i-lucide-send',
-  to: '/inbox'
+  to: '/dashboard/inbox'
 }, {
   label: 'New customer',
   icon: 'i-lucide-user-plus',
-  to: '/customers'
+  to: '/dashboard/customers'
 }]] satisfies DropdownMenuItem[][]
 
 const range = shallowRef<Range>({
