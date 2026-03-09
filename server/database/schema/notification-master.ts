@@ -56,6 +56,12 @@ export const updateNotificationMasterSchema = insertNotificationMasterSchema.par
   notificationCode: true
 })
 
+export const updateNotificationMasterStatusSchema = z.object({
+  status: z.enum(NOTIFICATION_STATUSES),
+  updatedBy: z.number().int('Updated by must be integer').positive('Invalid number or type')
+})
+
 export type NotificationMaster = typeof notificationMaster.$inferSelect
 export type InsertNotificationMaster = z.infer<typeof insertNotificationMasterSchema>
 export type UpdateNotificationMaster = z.infer<typeof updateNotificationMasterSchema>
+export type UpdateNotificationMasterStatus = z.infer<typeof updateNotificationMasterStatusSchema>
