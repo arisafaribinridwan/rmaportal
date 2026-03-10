@@ -85,15 +85,23 @@ const links = [[{
   icon: 'i-lucide-settings',
   type: 'trigger',
   children: [{
-    label: 'Users',
-    to: '/dashboard/setting/users',
+    label: 'General',
+    to: '/dashboard/settings',
     exact: true,
     onSelect: () => {
       open.value = false
     }
   }, {
+    label: 'Users',
+    to: '/dashboard/settings/users',
+    exact: true,
+    onSelect: () => {
+      open.value = false
+    }
+  },
+  {
     label: 'Security',
-    to: '/dashboard/setting/security',
+    to: '/dashboard/settings/security',
     exact: true,
     onSelect: () => {
       open.value = false
@@ -155,42 +163,19 @@ onMounted(async () => {
 
 <template>
   <UDashboardGroup unit="rem">
-    <UDashboardSidebar
-      id="default"
-      v-model:open="open"
-      collapsible
-      resizable
-      class="bg-elevated/25"
-      :ui="{ footer: 'lg:border-t lg:border-default' }"
-    >
+    <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
+      :ui="{ footer: 'lg:border-t lg:border-default' }">
       <template #header="{ collapsed }">
-        <img
-          v-if="collapsed"
-          src="/icon.png"
-          alt="Icon"
-          class="h-5 w-auto mx-auto"
-        >
+        <img v-if="collapsed" src="/icon.png" alt="Icon" class="h-5 w-auto mx-auto">
         <AppLogo v-else />
       </template>
 
       <template #default="{ collapsed }">
         <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
 
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[0]"
-          orientation="vertical"
-          tooltip
-          popover
-        />
+        <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical" tooltip popover />
 
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[1]"
-          orientation="vertical"
-          tooltip
-          class="mt-auto"
-        />
+        <UNavigationMenu :collapsed="collapsed" :items="links[1]" orientation="vertical" tooltip class="mt-auto" />
       </template>
 
       <template #footer="{ collapsed }">

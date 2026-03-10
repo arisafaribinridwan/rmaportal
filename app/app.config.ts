@@ -3,6 +3,21 @@ export default defineAppConfig({
     colors: {
       primary: 'green',
       neutral: 'zinc'
-    }
+    },
+    input: {
+      defaultVariants: {
+        size: 'lg',
+      }
+    },
+    select: {
+      defaultVariants: {
+        size: 'lg',
+      }
+    },
+    dropdownMenu: {
+      defaultVariants: {
+        size: 'lg',
+      }
+    },
   }
 })
