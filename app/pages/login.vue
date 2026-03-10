@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { size } from 'zod';
+import * as z from 'zod'
+import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
-
-const fields = [
+const fields = ref<AuthFormField[]>([
   {
     name: 'email',
     type: 'email',
@@ -27,9 +27,16 @@ const fields = [
     type: 'checkbox',
     label: 'Remember me'
   }
-]
+])
 
-const onSubmit = (data: unknown) => {
+const schema = z.object({
+  email: z.email('Invalid email'),
+  password: z.string('Password is required').min(8, 'Must be at least 8 characters')
+})
+
+type Schema = z.output<typeof schema>
+
+const onSubmit = async (data: FormSubmitEvent<Schema>) => {
   console.log('Login Submitted', data)
 }
 </script>
@@ -88,7 +95,8 @@ const onSubmit = (data: unknown) => {
       <div class="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
         <!-- Flex container to align the button top-right relative to the form area -->
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-8 shadow-sm">
-          <UAuthForm title="Welcome back" description="Enter your credentials to access your account." :fields="fields"
+          <UAuthForm :schema="schema" title="Welcome back" description="Enter your credentials to access your account."
+            :fields="fields"
             :submit="{ label: 'Sign In', color: 'success', block: true, size: 'xl', class: 'mt-6 font-medium rounded-xl' }"
             @submit="onSubmit">
             <!-- Custom Slot approach if needed -->
