@@ -82,7 +82,7 @@
     - Tetapkan sumber kebenaran tipe frontend: apakah pakai `app/types/master.ts` atau shared DB types untuk tiap flow
     - Buat daftar module yang masih placeholder agar mudah ditindak satu per satu
 
-- [/] **#9** Vendor CRUD (Backend)
+- [x] **#9** Vendor CRUD (Backend)
   - Module route dummy: `server/api/master/vendors.ts`
   - Module route final: `server/api/master/vendor/index.get.ts`, `server/api/master/vendor/index.post.ts`, `server/api/master/vendor/[id].get.ts`, `server/api/master/vendor/[id].put.ts`, `server/api/master/vendor/[id].patch.ts`
   - Module service: `server/services/vendor.service.ts`
@@ -94,7 +94,7 @@
     - Pastikan semua route memakai auth helper/role guard yang konsisten
     - Definisikan kontrak filter list: `search`, `isActive`, pagination bila diperlukan
 
-- [/] **#10** Vendor CRUD (Frontend)
+- [x] **#10** Vendor CRUD (Frontend)
   - Module page: `app/pages/dashboard/master/vendor.vue`
   - Module modal: `app/components/master/vendor/VendorAddModal.vue`, `app/components/master/vendor/VendorEditModal.vue`, `app/components/master/vendor/VendorDeleteModal.vue`
   - Status saat ini: table, filter, dan modal sudah ada, tapi submit masih placeholder
@@ -105,7 +105,7 @@
     - Tampilkan error API di toast/form state
     - Pastikan field `requiredPhotos` dan `requiredFields` mengikuti konstanta shared
 
-- [/] **#11** Product Model CRUD (Backend)
+- [x] **#11** Product Model CRUD (Backend)
   - Module route dummy: `server/api/master/product-models.ts`
   - Module route final: `server/api/master/product-model/index.get.ts`, `server/api/master/product-model/index.post.ts`, `server/api/master/product-model/[id].get.ts`, `server/api/master/product-model/[id].put.ts`, `server/api/master/product-model/[id].patch.ts`
   - Module service: `server/services/product-model.service.ts`
@@ -117,7 +117,7 @@
     - Tambahkan auth/role guard konsisten di semua route product model
     - Dokumentasikan format payload create/update di doc API internal
 
-- [/] **#12** Product Model CRUD (Frontend)
+- [x] **#12** Product Model CRUD (Frontend)
   - Module page: `app/pages/dashboard/master/product-model.vue`
   - Module modal: `app/components/master/product-model/ProductModelAddModal.vue`, `app/components/master/product-model/ProductModelEditModal.vue`, `app/components/master/product-model/ProductModelDeleteModal.vue`
   - Status saat ini: UI list dan modal sudah ada, namun data masih dari endpoint dummy
@@ -128,7 +128,7 @@
     - Tambahkan refresh table setelah aksi sukses
     - Samakan pesan sukses/error antar modal
 
-- [/] **#13** Defect Master CRUD (Backend)
+- [x] **#13** Defect Master CRUD (Backend)
   - Module route dummy: `server/api/master/defects.ts`
   - Module route final: `server/api/master/defect/index.get.ts`, `server/api/master/defect/index.post.ts`, `server/api/master/defect/[id].get.ts`, `server/api/master/defect/[id].put.ts`, `server/api/master/defect/[id].patch.ts`
   - Module service: `server/services/defect-master.service.ts`
@@ -140,7 +140,7 @@
     - Tambahkan role guard untuk QRCC/Admin
     - Putuskan apakah soft delete cukup via `isActive`
 
-- [/] **#14** Defect Master CRUD (Frontend)
+- [x] **#14** Defect Master CRUD (Frontend)
   - Module page: `app/pages/dashboard/master/defect.vue`
   - Module modal: `app/components/master/defect/DefectAddModal.vue`, `app/components/master/defect/DefectEditModal.vue`, `app/components/master/defect/DefectDeleteModal.vue`
   - Status saat ini: UI sudah ada, submit dan refresh flow belum final
@@ -151,7 +151,7 @@
     - Tampilkan validasi konflik `code`/`name` dari backend
     - Samakan naming toast dan empty state
 
-- [/] **#15** Notification Master CRUD + Excel Import (Backend)
+- [x] **#15** Notification Master CRUD + Excel Import (Backend)
   - Module route dummy: `server/api/master/notifications.ts`
   - Module route final: `server/api/master/notification/index.get.ts`, `server/api/master/notification/index.post.ts`, `server/api/master/notification/[id].get.ts`, `server/api/master/notification/[id].put.ts`, `server/api/master/notification/[id].patch.ts`
   - Module service: `server/services/notification-master.service.ts`
@@ -163,7 +163,7 @@
     - Tambahkan desain endpoint import Excel bila memang masuk scope phase ini
     - Tentukan format template file import dan error report row-level
 
-- [/] **#16** Notification Master CRUD + Excel Import UI (Frontend)
+- [x] **#16** Notification Master CRUD + Excel Import UI (Frontend)
   - Module page: `app/pages/dashboard/master/notification.vue`
   - Module modal: `app/components/master/notification/NotificationAddModal.vue`, `app/components/master/notification/NotificationEditModal.vue`, `app/components/master/notification/NotificationDeleteModal.vue`
   - Status saat ini: table dan modal CRUD sudah ada, tetapi belum full integrate dan belum ada import UI

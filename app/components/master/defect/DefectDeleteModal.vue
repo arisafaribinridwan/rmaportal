@@ -7,12 +7,33 @@ const props = defineProps<{
 
 const open = ref(false)
 
+const emit = defineEmits<{
+  success: []
+}>()
+
 const toast = useToast()
+const pending = ref(false)
+
 async function onSubmit() {
   if (!props.defect) return
-  // TODO: integrate with actual API to perform soft delete (set isActive to false)
-  toast.add({ title: 'Success', description: `Defect ${props.defect.name} has been ${props.defect.isActive ? 'deactivated' : 'activated'}`, color: 'success' })
-  open.value = false
+  pending.value = true
+  try {
+    await $fetch(`/api/master/defect/${props.defect.id}`, {
+      method: 'PATCH',
+      body: { isActive: !props.defect.isActive }
+    })
+    toast.add({ title: 'Success', description: `Defect ${props.defect.name} has been ${props.defect.isActive ? 'deactivated' : 'activated'}`, color: 'success' })
+    emit('success')
+    open.value = false
+  } catch (err: any) {
+    toast.add({
+      title: 'Error',
+      description: err.data?.message || err.message || 'Failed to update defect status',
+      color: 'error'
+    })
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -37,7 +58,7 @@ async function onSubmit() {
           :label="defect?.isActive ? 'Deactivate' : 'Activate'"
           :color="defect?.isActive ? 'error' : 'success'"
           variant="solid"
-          loading-auto
+          :loading="pending"
           @click="onSubmit"
         />
       </div>

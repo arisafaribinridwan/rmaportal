@@ -21,8 +21,8 @@ export const vendor = sqliteTable('vendor', {
   requiredPhotos: text({ mode: 'json' }).notNull().default('[]').$type<string[]>(),
   requiredFields: text({ mode: 'json' }).notNull().default('[]').$type<string[]>(),
   isActive: integer({ mode: 'boolean' }).notNull().default(true),
-  createdBy: integer().notNull(),
-  updatedBy: integer().notNull(),
+  createdBy: text().notNull(),
+  updatedBy: text().notNull(),
   createdAt: integer({ mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
@@ -54,8 +54,8 @@ export const insertVendorSchema = createInsertSchema(vendor, {
   requiredFields: z
     .array(z.enum(FIELD_NAMES))
     .default([]),
-  createdBy: z.number().int('Created by must be integer').positive('Invalid number or type'),
-  updatedBy: z.number().int('Updated by must be integer').positive('Invalid number or type')
+  createdBy: z.string().min(1, 'Created by is required'),
+  updatedBy: z.string().min(1, 'Updated by is required')
 }).omit({
   id: true,
   isActive: true,
@@ -73,7 +73,7 @@ export const updateVendorSchema = insertVendorSchema.partial().omit({
 // Update schema - only isActive for soft delete
 export const updateVendorStatusSchema = z.object({
   isActive: z.boolean({ message: 'Must be boolean' }),
-  updatedBy: z.number().int('Updated by must be integer').positive('Invalid number or type')
+  updatedBy: z.string().min(1, 'Updated by is required')
 })
 
 // Type exports

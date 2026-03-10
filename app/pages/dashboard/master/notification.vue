@@ -21,7 +21,7 @@ const columnFilters = ref([{
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
 
-const { data, status } = await useFetch<NotificationMaster[]>('/api/master/notifications', {
+const { data, status, refresh } = await useFetch<NotificationMaster[]>('/api/master/notifications', {
   lazy: true
 })
 
@@ -225,7 +225,14 @@ const pagination = ref({
         </template>
 
         <template #right>
-          <MasterNotificationAddModal />
+          <UButton
+            label="Import Excel"
+            icon="i-lucide-file-spreadsheet"
+            color="neutral"
+            variant="outline"
+            @click="toast.add({ title: 'Coming Soon', description: 'Excel import functionality is in development', color: 'info' })"
+          />
+          <MasterNotificationAddModal @success="refresh" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -236,11 +243,13 @@ const pagination = ref({
         v-if="selectedNotification"
         v-model:open="editModalOpen"
         :notification="selectedNotification"
+        @success="refresh"
       />
       <MasterNotificationDeleteModal
         v-if="selectedNotification"
         v-model:open="deleteModalOpen"
         :notification="selectedNotification"
+        @success="refresh"
       />
 
       <div class="flex flex-wrap items-center justify-between gap-1.5">

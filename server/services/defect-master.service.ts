@@ -15,7 +15,7 @@ export const defectMasterService = {
     return record
   },
 
-  async create(body: unknown, userId: number) {
+  async create(body: unknown, userId: string) {
     const data = insertDefectMasterSchema.parse({
       ...body as Record<string, unknown>,
       createdBy: userId,
@@ -35,7 +35,7 @@ export const defectMasterService = {
     return defectMasterRepo.create(data)
   },
 
-  async update(id: number, body: unknown, userId: number) {
+  async update(id: number, body: unknown, userId: string) {
     const data = updateDefectMasterSchema.parse({
       ...body as Record<string, unknown>,
       updatedBy: userId
@@ -63,7 +63,7 @@ export const defectMasterService = {
     return defectMasterRepo.update(id, data)
   },
 
-  async updateStatus(id: number, body: unknown, userId: number) {
+  async updateStatus(id: number, body: unknown, userId: string) {
     const data = updateDefectMasterStatusSchema.parse({
       ...body as Record<string, unknown>,
       updatedBy: userId

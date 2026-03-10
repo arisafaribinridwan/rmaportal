@@ -12,5 +12,5 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event)
 
-  return notificationMasterService.updateStatus(id, body, Number(user.id))
+  return notificationMasterService.updateStatus(id, body, user.id)
 })

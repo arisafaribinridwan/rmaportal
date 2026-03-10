@@ -2,6 +2,7 @@
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import type { Vendor } from '~/types/master'
+import { PHOTO_TYPES, FIELD_NAMES } from '~~/shared/utils/constants'
 
 const props = defineProps<{
   vendor: Vendor
@@ -50,15 +51,36 @@ function onClose() {
   open.value = false
 }
 
+const emit = defineEmits<{
+  success: []
+}>()
+
 const toast = useToast()
+const pending = ref(false)
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // TODO: integrate with actual API
-  toast.add({ title: 'Success', description: `Vendor ${event.data.name} updated`, color: 'success' })
-  open.value = false
+  pending.value = true
+  try {
+    await $fetch(`/api/master/vendor/${props.vendor.id}`, {
+      method: 'PUT',
+      body: event.data
+    })
+    toast.add({ title: 'Success', description: `Vendor ${event.data.name} updated`, color: 'success' })
+    emit('success')
+    open.value = false
+  } catch (err: any) {
+    toast.add({
+      title: 'Error',
+      description: err.data?.message || err.message || 'Failed to update vendor',
+      color: 'error'
+    })
+  } finally {
+    pending.value = false
+  }
 }
 
-const photoOptions = ['CLAIM', 'ODF', 'UNIT', 'PACKAGING', 'ACCESSORY']
-const fieldOptions = ['odfNumber', 'version', 'serialNumber', 'purchaseDate', 'storeName']
+const photoOptions = [...PHOTO_TYPES]
+const fieldOptions = [...FIELD_NAMES]
 </script>
 
 <template>
@@ -122,6 +144,7 @@ const fieldOptions = ['odfNumber', 'version', 'serialNumber', 'purchaseDate', 's
             color="primary"
             variant="solid"
             type="submit"
+            :loading="pending"
           />
         </div>
       </UForm>

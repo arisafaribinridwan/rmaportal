@@ -20,7 +20,7 @@ const columnFilters = ref([{
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
 
-const { data, status } = await useFetch<Vendor[]>('/api/master/vendors', {
+const { data, status, refresh } = await useFetch<Vendor[]>('/api/master/vendors', {
   lazy: true
 })
 
@@ -225,7 +225,7 @@ const pagination = ref({
         </template>
 
         <template #right>
-          <MasterVendorAddModal />
+          <MasterVendorAddModal @success="refresh" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -236,11 +236,13 @@ const pagination = ref({
         v-if="selectedVendor"
         v-model:open="editModalOpen"
         :vendor="selectedVendor"
+        @success="refresh"
       />
       <MasterVendorDeleteModal
         v-if="selectedVendor"
         v-model:open="deleteModalOpen"
         :vendor="selectedVendor"
+        @success="refresh"
       />
 
       <div class="flex flex-wrap items-center justify-between gap-1.5">

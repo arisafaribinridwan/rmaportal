@@ -1,40 +1,19 @@
-import type { Vendor } from '~/types/master'
+// server/api/master/vendors.ts
+// GET /api/master/vendors — List all vendors (used by frontend data tables)
+import { vendorService } from '~~/server/services/vendor.service'
 
-const vendors: Vendor[] = [
-  {
-    id: 1,
-    code: 'V001',
-    name: 'PT Elektronik Jaya',
-    requiredPhotos: ['CLAIM', 'ODF'],
-    requiredFields: ['odfNumber'],
-    isActive: true
-  },
-  {
-    id: 2,
-    code: 'V002',
-    name: 'CV Semesta Mandiri',
-    requiredPhotos: ['UNIT'],
-    requiredFields: ['version', 'serialNumber'],
-    isActive: true
-  },
-  {
-    id: 3,
-    code: 'V003',
-    name: 'Maju Bersama Corp',
-    requiredPhotos: [],
-    requiredFields: [],
-    isActive: false
-  },
-  {
-    id: 4,
-    code: 'V004',
-    name: 'Sharp Prima',
-    requiredPhotos: ['CLAIM', 'UNIT', 'ODF'],
-    requiredFields: ['odfNumber', 'version'],
-    isActive: true
+export default defineEventHandler(async (event) => {
+  const query = getQuery(event)
+
+  const filters: { isActive?: boolean, search?: string } = {}
+
+  if (query.isActive !== undefined) {
+    filters.isActive = query.isActive === 'true'
   }
-]
 
-export default eventHandler(async () => {
-  return vendors
+  if (typeof query.search === 'string' && query.search.trim()) {
+    filters.search = query.search.trim()
+  }
+
+  return vendorService.list(filters)
 })

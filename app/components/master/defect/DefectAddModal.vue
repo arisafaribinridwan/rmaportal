@@ -29,12 +29,33 @@ function onClose() {
   open.value = false
 }
 
+const emit = defineEmits<{
+  success: []
+}>()
+
 const toast = useToast()
+const pending = ref(false)
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // TODO: integrate with actual API
-  toast.add({ title: 'Success', description: `Defect ${event.data.name} created`, color: 'success' })
-  resetState()
-  open.value = false
+  pending.value = true
+  try {
+    await $fetch('/api/master/defect', {
+      method: 'POST',
+      body: event.data
+    })
+    toast.add({ title: 'Success', description: `Defect ${event.data.name} created`, color: 'success' })
+    emit('success')
+    resetState()
+    open.value = false
+  } catch (err: any) {
+    toast.add({
+      title: 'Error',
+      description: err.data?.message || err.message || 'Failed to create defect',
+      color: 'error'
+    })
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -84,6 +105,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             color="primary"
             variant="solid"
             type="submit"
+            :loading="pending"
           />
         </div>
       </UForm>

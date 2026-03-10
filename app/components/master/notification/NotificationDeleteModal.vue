@@ -7,12 +7,33 @@ const props = defineProps<{
 
 const open = ref(false)
 
+const emit = defineEmits<{
+  success: []
+}>()
+
 const toast = useToast()
+const pending = ref(false)
+
 async function onSubmit() {
   if (!props.notification) return
-  // TODO: integrate with actual API to perform soft delete (set status to EXPIRED)
-  toast.add({ title: 'Success', description: `Notification ${props.notification.notificationCode} has been expired`, color: 'success' })
-  open.value = false
+  pending.value = true
+  try {
+    await $fetch(`/api/master/notification/${props.notification.id}`, {
+      method: 'PATCH',
+      body: { status: 'EXPIRED' }
+    })
+    toast.add({ title: 'Success', description: `Notification ${props.notification.notificationCode} has been expired`, color: 'success' })
+    emit('success')
+    open.value = false
+  } catch (err: any) {
+    toast.add({
+      title: 'Error',
+      description: err.data?.message || err.message || 'Failed to expire notification',
+      color: 'error'
+    })
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -37,7 +58,7 @@ async function onSubmit() {
           label="Expire"
           color="error"
           variant="solid"
-          loading-auto
+          :loading="pending"
           @click="onSubmit"
         />
       </div>

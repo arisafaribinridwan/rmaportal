@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const { user } = event.context.auth
   const body = await readBody(event)
 
-  const created = await defectMasterService.create(body, Number(user.id))
+  const created = await defectMasterService.create(body, user.id)
 
   setResponseStatus(event, 201)
   return created
