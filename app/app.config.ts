@@ -6,18 +6,18 @@ export default defineAppConfig({
     },
     input: {
       defaultVariants: {
-        size: 'lg',
+        size: 'lg'
       }
     },
     select: {
       defaultVariants: {
-        size: 'lg',
+        size: 'lg'
       }
     },
     dropdownMenu: {
       defaultVariants: {
-        size: 'lg',
+        size: 'lg'
       }
-    },
+    }
   }
 })
