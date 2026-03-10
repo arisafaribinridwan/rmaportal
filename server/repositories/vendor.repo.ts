@@ -1,32 +1,32 @@
 // server/repositories/vendor.repo.ts
-import { eq, desc, and, like, sql, type SQL } from 'drizzle-orm'
+import { eq, desc, sql, type SQL } from 'drizzle-orm'
 import db from '~~/server/database'
 import { vendor } from '~~/server/database/schema'
-import type { 
-  InsertVendor, 
-  UpdateVendor, 
+import type {
+  InsertVendor,
+  UpdateVendor,
   UpdateVendorStatus,
   Vendor // Pastikan Anda meng-export type Select dari schema
 } from '~~/server/database/schema'
 
 /**
  * PREPARED STATEMENTS
- * Di industri 2026, kita menyiapkan query ini sekali saat aplikasi startup 
+ * Di industri 2026, kita menyiapkan query ini sekali saat aplikasi startup
  * untuk efisiensi eksekusi pada SQLite.
  */
 const getVendorByIdPrepared = db.query.vendor.findFirst({
-  where: (vendor, { eq }) => eq(vendor.id, sql.placeholder('id')),
+  where: (vendor, { eq }) => eq(vendor.id, sql.placeholder('id'))
 }).prepare()
 
 const getVendorByCodePrepared = db.query.vendor.findFirst({
-  where: (vendor, { eq }) => eq(vendor.code, sql.placeholder('code')),
+  where: (vendor, { eq }) => eq(vendor.code, sql.placeholder('code'))
 }).prepare()
 
 export const vendorRepo = {
   /**
    * Menggunakan Relational Query untuk kemudahan mapping di Nuxt.
    */
-  async findAll(filters?: { isActive?: boolean; search?: string }) {
+  async findAll(filters?: { isActive?: boolean, search?: string }) {
     return db.query.vendor.findMany({
       where: (vendor, { and, eq, like }) => {
         const conditions: SQL[] = []
@@ -34,7 +34,7 @@ export const vendorRepo = {
         if (filters?.search) conditions.push(like(vendor.name, `%${filters.search}%`))
         return conditions.length ? and(...conditions) : undefined
       },
-      orderBy: [desc(vendor.createdAt)],
+      orderBy: [desc(vendor.createdAt)]
     })
   },
 
@@ -59,7 +59,7 @@ export const vendorRepo = {
   },
 
   /**
-   * UPDATE: Menggunakan pattern array destructuring [result] 
+   * UPDATE: Menggunakan pattern array destructuring [result]
    * untuk memastikan Type-Safety pada return value.
    */
   async update(id: number, data: UpdateVendor): Promise<Vendor | undefined> {
@@ -68,7 +68,7 @@ export const vendorRepo = {
       .set({ ...data, updatedAt: new Date() }) // Pastikan timestamp terupdate
       .where(eq(vendor.id, id))
       .returning()
-    
+
     return result
   },
 
@@ -81,7 +81,7 @@ export const vendorRepo = {
       .set(data)
       .where(eq(vendor.id, id))
       .returning()
-    
+
     return result
   }
 }
