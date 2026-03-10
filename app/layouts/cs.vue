@@ -1,31 +1,36 @@
 <script setup lang="ts">
 import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui'
+import { authClient } from '~/utils/auth-client'
+import { useAuth } from '~/composables/useAuth'
+
+const { user } = useAuth()
 
 const items = computed<NavigationMenuItem[]>(() => [{
   label: 'My Claims',
   icon: 'i-lucide-file-text',
-  to: '/cs/Claims'
+  to: '/cs/claim'
 }])
 
 const dropdownItems = computed<DropdownMenuItem[][]>(() => [
-  [
-    {
-      label: 'Profile',
-      icon: 'i-lucide-user',
-      onSelect: () => {
-        navigateTo('/cs/profile')
-      }
+  [{
+    type: 'label',
+    label: user.value?.name ?? 'User'
+  }],
+  [{
+    label: 'Settings',
+    icon: 'i-lucide-settings',
+    onSelect: () => {
+      navigateTo('/dashboard/settings')
     }
-  ],
-  [
-    {
-      label: 'Logout',
-      icon: 'i-lucide-log-out',
-      onSelect: () => {
-        navigateTo('/cs/logout')
-      }
+  }],
+  [{
+    label: 'Logout',
+    icon: 'i-lucide-log-out',
+    onSelect: async () => {
+      await authClient.signOut()
+      await navigateTo('/login', { replace: true })
     }
-  ]
+  }]
 ])
 </script>
 
@@ -34,7 +39,6 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => [
     <UHeader>
       <template #title>
         <AppLogo />
-        <!-- <img src="/Logo.png" class="h-10 w-auto" alt="RMA Portal Logo"> -->
       </template>
 
       <template #right>
@@ -61,22 +65,10 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => [
           </UDropdownMenu>
         </div>
       </template>
-
-      <!-- <template #body>
-        <div class="text-right">
-          <UNavigationMenu
-            :items="items"
-            orientation="vertical"
-            class="-mx-2.5"
-          />
-        </div>
-      </template> -->
     </UHeader>
 
     <UMain class="max-w-7xl mx-auto lg:p-8 flex justify-center items-center">
       <slot />
     </UMain>
-
-    <!-- <UFooter /> -->
   </UApp>
 </template>

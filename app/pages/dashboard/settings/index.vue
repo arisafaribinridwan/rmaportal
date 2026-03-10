@@ -1,49 +1,41 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import { useAuth } from '~/composables/useAuth'
 
-const fileRef = ref<HTMLInputElement>()
+const { user } = useAuth()
+const toast = useToast()
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Too short'),
   email: z.email('Invalid email'),
-  username: z.string().min(2, 'Too short'),
-  avatar: z.string().optional(),
-  bio: z.string().optional()
+  username: z.string().min(2, 'Too short')
 })
 
 type ProfileSchema = z.output<typeof profileSchema>
 
 const profile = reactive<Partial<ProfileSchema>>({
-  name: 'Benjamin Canac',
-  email: 'ben@nuxtlabs.com',
-  username: 'benjamincanac',
-  avatar: undefined,
-  bio: undefined
+  name: user.value?.name ?? '',
+  email: user.value?.email ?? '',
+  username: (user.value as Record<string, unknown>)?.username as string ?? ''
 })
-const toast = useToast()
-async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
-  toast.add({
-    title: 'Success',
-    description: 'Your settings have been updated.',
-    icon: 'i-lucide-check',
-    color: 'success'
-  })
-  console.log(event.data)
-}
 
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement
-
-  if (!input.files?.length) {
-    return
+// Sync when session data loads/changes
+watch(user, (u) => {
+  if (u) {
+    profile.name = u.name ?? ''
+    profile.email = u.email ?? ''
+    profile.username = (u as Record<string, unknown>)?.username as string ?? ''
   }
+}, { immediate: true })
 
-  profile.avatar = URL.createObjectURL(input.files[0]!)
-}
-
-function onFileClick() {
-  fileRef.value?.click()
+async function onSubmit(_event: FormSubmitEvent<ProfileSchema>) {
+  toast.add({
+    title: 'Info',
+    description: 'Profile updates are managed by your administrator.',
+    icon: 'i-lucide-info',
+    color: 'info'
+  })
 }
 </script>
 
@@ -56,102 +48,74 @@ function onFileClick() {
   >
     <UPageCard
       title="Profile"
-      description="These informations will be displayed publicly."
+      description="Your account information."
       variant="naked"
       orientation="horizontal"
       class="mb-4"
-    >
-      <UButton
-        form="settings"
-        label="Save changes"
-        color="neutral"
-        type="submit"
-        class="w-fit lg:ms-auto"
-      />
-    </UPageCard>
+    />
 
     <UPageCard variant="subtle">
       <UFormField
         name="name"
         label="Name"
-        description="Will appear on receipts, invoices, and other communication."
-        required
+        description="Your display name."
         class="flex max-sm:flex-col justify-between items-start gap-4"
       >
         <UInput
           v-model="profile.name"
           autocomplete="off"
+          disabled
         />
       </UFormField>
       <USeparator />
       <UFormField
         name="email"
         label="Email"
-        description="Used to sign in, for email receipts and product updates."
-        required
+        description="Your login email address."
         class="flex max-sm:flex-col justify-between items-start gap-4"
       >
         <UInput
           v-model="profile.email"
           type="email"
           autocomplete="off"
+          disabled
         />
       </UFormField>
       <USeparator />
       <UFormField
         name="username"
         label="Username"
-        description="Your unique username for logging in and your profile URL."
-        required
+        description="Your unique username."
         class="flex max-sm:flex-col justify-between items-start gap-4"
       >
         <UInput
           v-model="profile.username"
-          type="username"
           autocomplete="off"
+          disabled
         />
       </UFormField>
       <USeparator />
       <UFormField
-        name="avatar"
-        label="Avatar"
-        description="JPG, GIF or PNG. 1MB Max."
-        class="flex max-sm:flex-col justify-between sm:items-center gap-4"
-      >
-        <div class="flex flex-wrap items-center gap-3">
-          <UAvatar
-            :src="profile.avatar"
-            :alt="profile.name"
-            size="lg"
-          />
-          <UButton
-            label="Choose"
-            color="neutral"
-            @click="onFileClick"
-          />
-          <input
-            ref="fileRef"
-            type="file"
-            class="hidden"
-            accept=".jpg, .jpeg, .png, .gif"
-            @change="onFileChange"
-          >
-        </div>
-      </UFormField>
-      <USeparator />
-      <UFormField
-        name="bio"
-        label="Bio"
-        description="Brief description for your profile. URLs are hyperlinked."
+        label="Role"
+        description="Your assigned role in the system."
         class="flex max-sm:flex-col justify-between items-start gap-4"
-        :ui="{ container: 'w-full' }"
       >
-        <UTextarea
-          v-model="profile.bio"
-          :rows="5"
-          autoresize
-          class="w-full"
+        <UBadge
+          :label="(user as Record<string, unknown>)?.role as string ?? '-'"
+          color="primary"
+          variant="subtle"
+          size="lg"
         />
+      </UFormField>
+      <USeparator />
+      <UFormField
+        label="Branch"
+        description="Your assigned branch."
+        class="flex max-sm:flex-col justify-between items-start gap-4"
+      >
+        <span class="text-sm text-muted">
+          {{ (user as Record<string, unknown>)?.branch ?? '-' }}
+        </span>
       </UFormField>
     </UPageCard>
   </UForm>

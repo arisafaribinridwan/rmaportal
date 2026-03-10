@@ -13,7 +13,7 @@ import type { UserRole } from '~~/shared/utils/constants'
  */
 const ROUTE_ACCESS: { pattern: string, roles: UserRole[] }[] = [
   // User Management — Admin only
-  { pattern: '/dashboard/setting/users', roles: ['ADMIN'] },
+  { pattern: '/dashboard/settings/users', roles: ['ADMIN'] },
 
   // Claims Management — QRCC + Admin
   { pattern: '/dashboard/claims', roles: ['QRCC', 'ADMIN'] },
@@ -31,16 +31,13 @@ const ROUTE_ACCESS: { pattern: string, roles: UserRole[] }[] = [
   { pattern: '/dashboard/reports', roles: ['QRCC', 'MANAGEMENT', 'ADMIN'] },
 
   // Settings (profile, security) — all dashboard roles
-  { pattern: '/dashboard/setting', roles: ['QRCC', 'MANAGEMENT', 'ADMIN'] },
+  { pattern: '/dashboard/settings', roles: ['QRCC', 'MANAGEMENT', 'ADMIN'] },
 
   // Dashboard home — all dashboard roles
   { pattern: '/dashboard', roles: ['QRCC', 'MANAGEMENT', 'ADMIN'] }
 ]
 
 export default defineNuxtRouteMiddleware((to) => {
-  // disable middleware sementara untuk fix ui dulu
-  return
-
   if (import.meta.server) return
 
   const { role, getHomePath } = useAuth()
