@@ -10,7 +10,7 @@ const links = [[{
   label: 'Members',
   icon: 'i-lucide-users',
   to: '/dashboard/settings/members'
-},{
+}, {
   label: 'Security',
   icon: 'i-lucide-shield',
   to: '/dashboard/settings/security'

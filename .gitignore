@@ -27,3 +27,5 @@ logs
 .history
 
 .claude
+.config
+opencode.json
