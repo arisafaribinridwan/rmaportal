@@ -95,10 +95,14 @@ const onSubmit = async (data: FormSubmitEvent<Schema>) => {
       <div class="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
         <!-- Flex container to align the button top-right relative to the form area -->
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-8 shadow-sm">
-          <UAuthForm :schema="schema" title="Welcome back" description="Enter your credentials to access your account."
+          <UAuthForm
+            :schema="schema"
+            title="Welcome back"
+            description="Enter your credentials to access your account."
             :fields="fields"
             :submit="{ label: 'Sign In', color: 'success', block: true, size: 'xl', class: 'mt-6 font-medium rounded-xl' }"
-            @submit="onSubmit">
+            @submit="onSubmit"
+          >
             <!-- Custom Slot approach if needed -->
             <template #password-hint>
               <NuxtLink to="/forgot-password" class="text-sm font-medium text-indigo-500 hover:text-indigo-600">
