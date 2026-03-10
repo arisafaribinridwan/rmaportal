@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const { user } = event.context.auth
   const body = await readBody(event)
 
-  const created = await vendorService.create(body, Number(user.id))
+  const created = await vendorService.create(body, user.id)
 
   setResponseStatus(event, 201)
   return created

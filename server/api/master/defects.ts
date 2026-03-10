@@ -1,38 +1,19 @@
-import type { DefectMaster } from '~/types/master'
+// server/api/master/defects.ts
+// GET /api/master/defects — List all defects (used by frontend data tables)
+import { defectMasterService } from '~~/server/services/defect-master.service'
 
-const defects: DefectMaster[] = [
-  {
-    id: 1,
-    code: 'D01',
-    name: 'Mati Total',
-    isActive: true
-  },
-  {
-    id: 2,
-    code: 'D02',
-    name: 'Layar Pecah/Retak',
-    isActive: true
-  },
-  {
-    id: 3,
-    code: 'D03',
-    name: 'Suara Tidak Keluar',
-    isActive: true
-  },
-  {
-    id: 4,
-    code: 'D04',
-    name: 'Panel Bergaris',
-    isActive: true
-  },
-  {
-    id: 5,
-    code: 'D05',
-    name: 'Port HDMI Rusak',
-    isActive: false
+export default defineEventHandler(async (event) => {
+  const query = getQuery(event)
+
+  const filters: { isActive?: boolean, search?: string } = {}
+
+  if (query.isActive !== undefined) {
+    filters.isActive = query.isActive === 'true'
   }
-]
 
-export default eventHandler(async () => {
-  return defects
+  if (typeof query.search === 'string' && query.search.trim()) {
+    filters.search = query.search.trim()
+  }
+
+  return defectMasterService.list(filters)
 })

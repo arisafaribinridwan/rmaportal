@@ -36,12 +36,33 @@ function onClose() {
   open.value = false
 }
 
+const emit = defineEmits<{
+  success: []
+}>()
+
 const toast = useToast()
+const pending = ref(false)
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // TODO: integrate with actual API
-  toast.add({ title: 'Success', description: `Vendor ${event.data.name} created`, color: 'success' })
-  resetState()
-  open.value = false
+  pending.value = true
+  try {
+    await $fetch('/api/master/vendor', {
+      method: 'POST',
+      body: event.data
+    })
+    toast.add({ title: 'Success', description: `Vendor ${event.data.name} created`, color: 'success' })
+    emit('success')
+    resetState()
+    open.value = false
+  } catch (error: any) {
+    toast.add({
+      title: 'Error',
+      description: error.data?.message || 'Failed to create vendor',
+      color: 'error'
+    })
+  } finally {
+    pending.value = false
+  }
 }
 
 const photoOptions = [...PHOTO_TYPES]
@@ -114,6 +135,7 @@ const fieldOptions = [...FIELD_NAMES]
             color="primary"
             variant="solid"
             type="submit"
+            :loading="pending"
           />
         </div>
       </UForm>

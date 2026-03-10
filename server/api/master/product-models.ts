@@ -1,48 +1,26 @@
-import type { ProductModel } from '~/types/master'
+// server/api/master/product-models.ts
+// GET /api/master/product-models — List all product models (used by frontend data tables)
+import { productModelService } from '~~/server/services/product-model.service'
 
-const productModels: ProductModel[] = [
-  {
-    id: 1,
-    name: 'LED TV 32inch HD',
-    inch: 32,
-    vendorId: 1,
-    vendorName: 'PT Elektronik Jaya',
-    isActive: true
-  },
-  {
-    id: 2,
-    name: 'LED TV 43inch FHD',
-    inch: 43,
-    vendorId: 1,
-    vendorName: 'PT Elektronik Jaya',
-    isActive: true
-  },
-  {
-    id: 3,
-    name: 'OLED TV 55inch 4K',
-    inch: 55,
-    vendorId: 2,
-    vendorName: 'CV Semesta Mandiri',
-    isActive: true
-  },
-  {
-    id: 4,
-    name: 'LCD Monitor 24inch',
-    inch: 24,
-    vendorId: 4,
-    vendorName: 'Sharp Prima',
-    isActive: false
-  },
-  {
-    id: 5,
-    name: 'Smart TV 65inch 4K',
-    inch: 65,
-    vendorId: 4,
-    vendorName: 'Sharp Prima',
-    isActive: true
+export default defineEventHandler(async (event) => {
+  const query = getQuery(event)
+
+  const filters: { isActive?: boolean, search?: string, vendorId?: number } = {}
+
+  if (query.isActive !== undefined) {
+    filters.isActive = query.isActive === 'true'
   }
-]
 
-export default eventHandler(async () => {
-  return productModels
+  if (typeof query.search === 'string' && query.search.trim()) {
+    filters.search = query.search.trim()
+  }
+
+  if (query.vendorId !== undefined) {
+    const vendorId = Number(query.vendorId)
+    if (!isNaN(vendorId) && vendorId > 0) {
+      filters.vendorId = vendorId
+    }
+  }
+
+  return productModelService.list(filters)
 })

@@ -20,7 +20,7 @@ const columnFilters = ref([{
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
 
-const { data, status } = await useFetch<ProductModel[]>('/api/master/product-models', {
+const { data, status, refresh } = await useFetch<ProductModel[]>('/api/master/product-models', {
   lazy: true
 })
 
@@ -208,7 +208,7 @@ const pagination = ref({
         </template>
 
         <template #right>
-          <MasterProductModelAddModal />
+          <MasterProductModelAddModal @success="refresh" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -219,11 +219,13 @@ const pagination = ref({
         v-if="selectedModel"
         v-model:open="editModalOpen"
         :product-model="selectedModel"
+        @success="refresh"
       />
       <MasterProductModelDeleteModal
         v-if="selectedModel"
         v-model:open="deleteModalOpen"
         :product-model="selectedModel"
+        @success="refresh"
       />
 
       <div class="flex flex-wrap items-center justify-between gap-1.5">

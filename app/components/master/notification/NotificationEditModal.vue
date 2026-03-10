@@ -22,7 +22,7 @@ type Schema = z.output<typeof schema>
 
 const state = reactive<Partial<Schema>>({
   notificationCode: props.notification.notificationCode,
-  notificationDate: props.notification.notificationDate,
+  notificationDate: props.notification.notificationDate ? new Date(props.notification.notificationDate).toISOString().split('T')[0] : '',
   modelId: props.notification.modelId,
   branch: props.notification.branch,
   vendorId: props.notification.vendorId,
@@ -32,7 +32,7 @@ const state = reactive<Partial<Schema>>({
 watch(() => props.notification, (newVal) => {
   if (newVal) {
     state.notificationCode = newVal.notificationCode
-    state.notificationDate = newVal.notificationDate
+    state.notificationDate = newVal.notificationDate ? new Date(newVal.notificationDate).toISOString().split('T')[0] : ''
     state.modelId = newVal.modelId
     state.branch = newVal.branch
     state.vendorId = newVal.vendorId
@@ -64,7 +64,7 @@ const statusOptions = ['NEW', 'USED', 'EXPIRED']
 
 function resetState() {
   state.notificationCode = props.notification.notificationCode
-  state.notificationDate = props.notification.notificationDate
+  state.notificationDate = props.notification.notificationDate ? new Date(props.notification.notificationDate).toISOString().split('T')[0] : ''
   state.modelId = props.notification.modelId
   state.branch = props.notification.branch
   state.vendorId = props.notification.vendorId
@@ -76,11 +76,36 @@ function onClose() {
   open.value = false
 }
 
+const emit = defineEmits<{
+  success: []
+}>()
+
 const toast = useToast()
+const pending = ref(false)
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // TODO: integrate with actual API
-  toast.add({ title: 'Success', description: `Notification ${event.data.notificationCode} updated`, color: 'success' })
-  open.value = false
+  pending.value = true
+  try {
+    const dataToSend = {
+      ...event.data,
+      notificationDate: new Date(event.data.notificationDate).toISOString()
+    }
+    await $fetch(`/api/master/notification/${props.notification.id}`, {
+      method: 'PUT',
+      body: dataToSend
+    })
+    toast.add({ title: 'Success', description: `Notification ${event.data.notificationCode} updated`, color: 'success' })
+    emit('success')
+    open.value = false
+  } catch (err: any) {
+    toast.add({
+      title: 'Error',
+      description: err.data?.message || err.message || 'Failed to update notification',
+      color: 'error'
+    })
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -156,6 +181,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             color="primary"
             variant="solid"
             type="submit"
+            :loading="pending"
           />
         </div>
       </UForm>

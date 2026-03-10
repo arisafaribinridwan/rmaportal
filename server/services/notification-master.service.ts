@@ -29,7 +29,7 @@ export const notificationMasterService = {
   /**
    * Create a new notification. Validates input and checks code uniqueness.
    */
-  async create(body: unknown, userId: number) {
+  async create(body: unknown, userId: string) {
     const data = insertNotificationMasterSchema.parse({
       ...body as Record<string, unknown>,
       createdBy: userId,
@@ -47,7 +47,7 @@ export const notificationMasterService = {
   /**
    * Update an existing notification. Validates input & checks existence.
    */
-  async update(id: number, body: unknown, userId: number) {
+  async update(id: number, body: unknown, userId: string) {
     const data = updateNotificationMasterSchema.parse({
       ...body as Record<string, unknown>,
       updatedBy: userId
@@ -64,7 +64,7 @@ export const notificationMasterService = {
   /**
    * Update notification status (NEW → USED → EXPIRED).
    */
-  async updateStatus(id: number, body: unknown, userId: number) {
+  async updateStatus(id: number, body: unknown, userId: string) {
     const data = updateNotificationMasterStatusSchema.parse({
       ...body as Record<string, unknown>,
       updatedBy: userId

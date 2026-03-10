@@ -9,8 +9,8 @@ export const defectMaster = sqliteTable('defect_master', {
   code: text().notNull().unique(),
   name: text().notNull().unique(),
   isActive: integer({ mode: 'boolean' }).notNull().default(true),
-  createdBy: integer().notNull(),
-  updatedBy: integer().notNull(),
+  createdBy: text().notNull(),
+  updatedBy: text().notNull(),
   createdAt: integer({ mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
@@ -28,8 +28,8 @@ export const defectMaster = sqliteTable('defect_master', {
 export const insertDefectMasterSchema = createInsertSchema(defectMaster, {
   code: z.string().min(1, 'Defect code is required').trim(),
   name: z.string().min(1, 'Defect name is required').trim(),
-  createdBy: z.number().int('Created by must be integer').positive('Invalid number or type'),
-  updatedBy: z.number().int('Updated by must be integer').positive('Invalid number or type')
+  createdBy: z.string().min(1, 'Created by is required'),
+  updatedBy: z.string().min(1, 'Updated by is required')
 }).omit({
   id: true,
   isActive: true,
@@ -45,7 +45,7 @@ export const updateDefectMasterSchema = insertDefectMasterSchema.partial().omit(
 
 export const updateDefectMasterStatusSchema = z.object({
   isActive: z.boolean({ message: 'Must be boolean' }),
-  updatedBy: z.number().int('Updated by must be integer').positive('Invalid number or type')
+  updatedBy: z.string().min(1, 'Updated by is required')
 })
 
 export type DefectMaster = typeof defectMaster.$inferSelect

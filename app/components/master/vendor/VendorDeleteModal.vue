@@ -7,12 +7,33 @@ const props = defineProps<{
 
 const open = ref(false)
 
+const emit = defineEmits<{
+  success: []
+}>()
+
 const toast = useToast()
+const pending = ref(false)
+
 async function onSubmit() {
   if (!props.vendor) return
-  // TODO: integrate with actual API to perform soft delete (set isActive to false)
-  toast.add({ title: 'Success', description: `Vendor ${props.vendor.name} has been ${props.vendor.isActive ? 'deactivated' : 'activated'}`, color: 'success' })
-  open.value = false
+  pending.value = true
+  try {
+    await $fetch(`/api/master/vendor/${props.vendor.id}`, {
+      method: 'PATCH',
+      body: { isActive: !props.vendor.isActive }
+    })
+    toast.add({ title: 'Success', description: `Vendor ${props.vendor.name} has been ${props.vendor.isActive ? 'deactivated' : 'activated'}`, color: 'success' })
+    emit('success')
+    open.value = false
+  } catch (err: any) {
+    toast.add({
+      title: 'Error',
+      description: err.data?.message || err.message || 'Failed to update vendor status',
+      color: 'error'
+    })
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -37,7 +58,7 @@ async function onSubmit() {
           :label="vendor?.isActive ? 'Deactivate' : 'Activate'"
           :color="vendor?.isActive ? 'error' : 'success'"
           variant="solid"
-          loading-auto
+          :loading="pending"
           @click="onSubmit"
         />
       </div>

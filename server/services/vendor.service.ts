@@ -24,7 +24,7 @@ export const vendorService = {
   /**
    * Create a new vendor. Validates input and checks code uniqueness.
    */
-  async create(body: unknown, userId: number) {
+  async create(body: unknown, userId: string) {
     const data = insertVendorSchema.parse({
       ...body as Record<string, unknown>,
       createdBy: userId,
@@ -42,7 +42,7 @@ export const vendorService = {
   /**
    * Update an existing vendor. Validates input, checks existence & code uniqueness.
    */
-  async update(id: number, body: unknown, userId: number) {
+  async update(id: number, body: unknown, userId: string) {
     const data = updateVendorSchema.parse({
       ...body as Record<string, unknown>,
       updatedBy: userId
@@ -68,7 +68,7 @@ export const vendorService = {
   /**
    * Toggle vendor active status (soft delete / restore).
    */
-  async updateStatus(id: number, body: unknown, userId: number) {
+  async updateStatus(id: number, body: unknown, userId: string) {
     const data = updateVendorStatusSchema.parse({
       ...body as Record<string, unknown>,
       updatedBy: userId

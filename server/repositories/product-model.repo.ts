@@ -1,12 +1,13 @@
 // server/repositories/product-model.repo.ts
 import { eq, desc, and, like, type SQL } from 'drizzle-orm'
 import db from '~~/server/database'
-import { productModel } from '~~/server/database/schema'
+import { productModel, vendor } from '~~/server/database/schema'
 import type { InsertProductModel, UpdateProductModel, UpdateProductModelStatus } from '~~/server/database/schema'
 
 export const productModelRepo = {
   /**
    * Find all product models with optional filters.
+   * Includes LEFT JOIN with vendor to provide vendorName.
    */
   async findAll(filters?: { isActive?: boolean, search?: string, vendorId?: number }) {
     const conditions: SQL[] = []
@@ -24,19 +25,43 @@ export const productModelRepo = {
     }
 
     return db
-      .select()
+      .select({
+        id: productModel.id,
+        name: productModel.name,
+        inch: productModel.inch,
+        vendorId: productModel.vendorId,
+        vendorName: vendor.name,
+        isActive: productModel.isActive,
+        createdBy: productModel.createdBy,
+        updatedBy: productModel.updatedBy,
+        createdAt: productModel.createdAt,
+        updatedAt: productModel.updatedAt
+      })
       .from(productModel)
+      .leftJoin(vendor, eq(productModel.vendorId, vendor.id))
       .where(conditions.length ? and(...conditions) : undefined)
       .orderBy(desc(productModel.createdAt))
   },
 
   /**
-   * Find a single product model by ID.
+   * Find a single product model by ID (with vendor name).
    */
   async findById(id: number) {
     return db
-      .select()
+      .select({
+        id: productModel.id,
+        name: productModel.name,
+        inch: productModel.inch,
+        vendorId: productModel.vendorId,
+        vendorName: vendor.name,
+        isActive: productModel.isActive,
+        createdBy: productModel.createdBy,
+        updatedBy: productModel.updatedBy,
+        createdAt: productModel.createdAt,
+        updatedAt: productModel.updatedAt
+      })
       .from(productModel)
+      .leftJoin(vendor, eq(productModel.vendorId, vendor.id))
       .where(eq(productModel.id, id))
       .get()
   },

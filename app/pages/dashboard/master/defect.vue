@@ -20,7 +20,7 @@ const columnFilters = ref([{
 const columnVisibility = ref()
 const rowSelection = ref({ 1: true })
 
-const { data, status } = await useFetch<DefectMaster[]>('/api/master/defects', {
+const { data, status, refresh } = await useFetch<DefectMaster[]>('/api/master/defects', {
   lazy: true
 })
 
@@ -203,7 +203,7 @@ const pagination = ref({
         </template>
 
         <template #right>
-          <MasterDefectAddModal />
+          <MasterDefectAddModal @success="refresh" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -214,11 +214,13 @@ const pagination = ref({
         v-if="selectedDefect"
         v-model:open="editModalOpen"
         :defect="selectedDefect"
+        @success="refresh"
       />
       <MasterDefectDeleteModal
         v-if="selectedDefect"
         v-model:open="deleteModalOpen"
         :defect="selectedDefect"
+        @success="refresh"
       />
 
       <div class="flex flex-wrap items-center justify-between gap-1.5">

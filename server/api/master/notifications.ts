@@ -1,52 +1,28 @@
-import type { NotificationMaster } from '~/types/master'
+// server/api/master/notifications.ts
+// GET /api/master/notifications — List all notifications (used by frontend data tables)
+import { notificationMasterService } from '~~/server/services/notification-master.service'
+import { NOTIFICATION_STATUSES } from '~~/shared/utils/constants'
+import type { NotificationStatus } from '~~/shared/utils/constants'
 
-const notifications: NotificationMaster[] = [
-  {
-    id: 1,
-    notificationCode: 'NTF-2023-001',
-    notificationDate: '2023-10-01',
-    modelId: 1,
-    modelName: 'LED TV 32inch HD',
-    branch: 'BDO',
-    vendorId: 1,
-    vendorName: 'PT Elektronik Jaya',
-    status: 'NEW'
-  },
-  {
-    id: 2,
-    notificationCode: 'NTF-2023-002',
-    notificationDate: '2023-10-05',
-    modelId: 3,
-    modelName: 'OLED TV 55inch 4K',
-    branch: 'JKT',
-    vendorId: 2,
-    vendorName: 'CV Semesta Mandiri',
-    status: 'USED'
-  },
-  {
-    id: 3,
-    notificationCode: 'NTF-2023-003',
-    notificationDate: '2023-09-15',
-    modelId: 5,
-    modelName: 'Smart TV 65inch 4K',
-    branch: 'SBY',
-    vendorId: 4,
-    vendorName: 'Sharp Prima',
-    status: 'EXPIRED'
-  },
-  {
-    id: 4,
-    notificationCode: 'NTF-2023-004',
-    notificationDate: '2023-10-10',
-    modelId: 2,
-    modelName: 'LED TV 43inch FHD',
-    branch: 'MDN',
-    vendorId: 1,
-    vendorName: 'PT Elektronik Jaya',
-    status: 'NEW'
+export default defineEventHandler(async (event) => {
+  const query = getQuery(event)
+
+  const filters: { status?: NotificationStatus, vendorId?: number, search?: string } = {}
+
+  if (typeof query.status === 'string' && NOTIFICATION_STATUSES.includes(query.status as NotificationStatus)) {
+    filters.status = query.status as NotificationStatus
   }
-]
 
-export default eventHandler(async () => {
-  return notifications
+  if (query.vendorId !== undefined) {
+    const vendorId = Number(query.vendorId)
+    if (!isNaN(vendorId) && vendorId > 0) {
+      filters.vendorId = vendorId
+    }
+  }
+
+  if (typeof query.search === 'string' && query.search.trim()) {
+    filters.search = query.search.trim()
+  }
+
+  return notificationMasterService.list(filters)
 })

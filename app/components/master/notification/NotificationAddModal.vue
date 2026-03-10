@@ -61,12 +61,37 @@ function onClose() {
   open.value = false
 }
 
+const emit = defineEmits<{
+  success: []
+}>()
+
 const toast = useToast()
+const pending = ref(false)
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // TODO: integrate with actual API
-  toast.add({ title: 'Success', description: `Notification ${event.data.notificationCode} created`, color: 'success' })
-  resetState()
-  open.value = false
+  pending.value = true
+  try {
+    const dataToSend = {
+      ...event.data,
+      notificationDate: new Date(event.data.notificationDate).toISOString()
+    }
+    await $fetch('/api/master/notification', {
+      method: 'POST',
+      body: dataToSend
+    })
+    toast.add({ title: 'Success', description: `Notification ${event.data.notificationCode} created`, color: 'success' })
+    emit('success')
+    resetState()
+    open.value = false
+  } catch (err: any) {
+    toast.add({
+      title: 'Error',
+      description: err.data?.message || err.message || 'Failed to create notification',
+      color: 'error'
+    })
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -142,6 +167,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             color="primary"
             variant="solid"
             type="submit"
+            :loading="pending"
           />
         </div>
       </UForm>

@@ -15,8 +15,8 @@ export const notificationMaster = sqliteTable('notification_master', {
   branch: text().notNull(),
   vendorId: integer().notNull().references(() => vendor.id, { onDelete: 'restrict' }),
   status: text().notNull().$type<typeof NOTIFICATION_STATUSES[number]>(),
-  createdBy: integer().notNull(),
-  updatedBy: integer().notNull(),
+  createdBy: text().notNull(),
+  updatedBy: text().notNull(),
   createdAt: integer({ mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
@@ -41,8 +41,8 @@ export const insertNotificationMasterSchema = createInsertSchema(notificationMas
   branch: z.string().min(1, 'Branch is required').trim(),
   vendorId: z.number().int('Vendor ID must be an integer').positive('Invalid vendor ID'),
   status: z.enum(NOTIFICATION_STATUSES),
-  createdBy: z.number().int('Created by must be integer').positive('Invalid number or type'),
-  updatedBy: z.number().int('Updated by must be integer').positive('Invalid number or type')
+  createdBy: z.string().min(1, 'Created by is required'),
+  updatedBy: z.string().min(1, 'Updated by is required')
 }).omit({
   id: true,
   createdAt: true,
@@ -58,7 +58,7 @@ export const updateNotificationMasterSchema = insertNotificationMasterSchema.par
 
 export const updateNotificationMasterStatusSchema = z.object({
   status: z.enum(NOTIFICATION_STATUSES),
-  updatedBy: z.number().int('Updated by must be integer').positive('Invalid number or type')
+  updatedBy: z.string().min(1, 'Updated by is required')
 })
 
 export type NotificationMaster = typeof notificationMaster.$inferSelect

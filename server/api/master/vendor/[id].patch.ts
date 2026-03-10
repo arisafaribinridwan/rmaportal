@@ -12,5 +12,5 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event)
 
-  return vendorService.updateStatus(id, body, Number(user.id))
+  return vendorService.updateStatus(id, body, user.id)
 })
