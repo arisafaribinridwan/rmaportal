@@ -25,10 +25,11 @@ async function onSubmit() {
     toast.add({ title: 'Success', description: `Vendor ${props.vendor.name} has been ${props.vendor.isActive ? 'deactivated' : 'activated'}`, color: 'success' })
     emit('success')
     open.value = false
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as { data?: { message?: string }, message?: string }
     toast.add({
       title: 'Error',
-      description: err.data?.message || err.message || 'Failed to update vendor status',
+      description: error.data?.message || error.message || 'Failed to update vendor status',
       color: 'error'
     })
   } finally {

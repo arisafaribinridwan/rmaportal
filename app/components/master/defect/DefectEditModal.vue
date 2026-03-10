@@ -59,10 +59,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     toast.add({ title: 'Success', description: `Defect ${event.data.name} updated`, color: 'success' })
     emit('success')
     open.value = false
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as { data?: { message?: string }, message?: string }
     toast.add({
       title: 'Error',
-      description: err.data?.message || err.message || 'Failed to update defect',
+      description: error.data?.message || error.message || 'Failed to update defect',
       color: 'error'
     })
   } finally {

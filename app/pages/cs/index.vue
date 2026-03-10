@@ -19,7 +19,12 @@ const state = reactive<Partial<Schema>>({
 })
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  console.log(event.data)
+  if (event.data.notification) {
+    navigateTo({
+      path: '/cs/claim/create',
+      query: { notification: event.data.notification }
+    })
+  }
 }
 </script>
 

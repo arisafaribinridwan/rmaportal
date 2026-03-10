@@ -11,8 +11,8 @@ const props = defineProps<{
 const schema = z.object({
   code: z.string().min(1, 'Vendor code is required'),
   name: z.string().min(2, 'Vendor name is required'),
-  requiredPhotos: z.array(z.string()).default([]),
-  requiredFields: z.array(z.string()).default([]),
+  requiredPhotos: z.array(z.enum(PHOTO_TYPES)).default([]),
+  requiredFields: z.array(z.enum(FIELD_NAMES)).default([]),
   isActive: z.boolean().default(true)
 })
 
@@ -20,11 +20,17 @@ const open = ref(false)
 
 type Schema = z.output<typeof schema>
 
-const state = reactive<Partial<Schema>>({
+const state = reactive<{
+  code: string
+  name: string
+  requiredPhotos: Schema['requiredPhotos']
+  requiredFields: Schema['requiredFields']
+  isActive: boolean
+}>({
   code: props.vendor.code,
   name: props.vendor.name,
-  requiredPhotos: props.vendor.requiredPhotos || [],
-  requiredFields: props.vendor.requiredFields || [],
+  requiredPhotos: (props.vendor.requiredPhotos as Schema['requiredPhotos']) || [],
+  requiredFields: (props.vendor.requiredFields as Schema['requiredFields']) || [],
   isActive: props.vendor.isActive
 })
 
@@ -32,8 +38,8 @@ watch(() => props.vendor, (newVal) => {
   if (newVal) {
     state.code = newVal.code
     state.name = newVal.name
-    state.requiredPhotos = newVal.requiredPhotos || []
-    state.requiredFields = newVal.requiredFields || []
+    state.requiredPhotos = (newVal.requiredPhotos as Schema['requiredPhotos']) || []
+    state.requiredFields = (newVal.requiredFields as Schema['requiredFields']) || []
     state.isActive = newVal.isActive
   }
 }, { deep: true })
@@ -41,8 +47,8 @@ watch(() => props.vendor, (newVal) => {
 function resetState() {
   state.code = props.vendor.code
   state.name = props.vendor.name
-  state.requiredPhotos = props.vendor.requiredPhotos || []
-  state.requiredFields = props.vendor.requiredFields || []
+  state.requiredPhotos = (props.vendor.requiredPhotos as Schema['requiredPhotos']) || []
+  state.requiredFields = (props.vendor.requiredFields as Schema['requiredFields']) || []
   state.isActive = props.vendor.isActive
 }
 
@@ -68,10 +74,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     toast.add({ title: 'Success', description: `Vendor ${event.data.name} updated`, color: 'success' })
     emit('success')
     open.value = false
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as { data?: { message?: string }, message?: string }
     toast.add({
       title: 'Error',
-      description: err.data?.message || err.message || 'Failed to update vendor',
+      description: error.data?.message || error.message || 'Failed to update vendor',
       color: 'error'
     })
   } finally {
@@ -79,8 +86,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   }
 }
 
-const photoOptions = [...PHOTO_TYPES]
-const fieldOptions = [...FIELD_NAMES]
+const photoOptions = [...PHOTO_TYPES] as Schema['requiredPhotos']
+const fieldOptions = [...FIELD_NAMES] as Schema['requiredFields']
 </script>
 
 <template>

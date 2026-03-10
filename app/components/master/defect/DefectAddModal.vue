@@ -47,10 +47,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     emit('success')
     resetState()
     open.value = false
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as { data?: { message?: string }, message?: string }
     toast.add({
       title: 'Error',
-      description: err.data?.message || err.message || 'Failed to create defect',
+      description: error.data?.message || error.message || 'Failed to create defect',
       color: 'error'
     })
   } finally {

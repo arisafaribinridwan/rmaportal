@@ -25,10 +25,11 @@ async function onSubmit() {
     toast.add({ title: 'Success', description: `Notification ${props.notification.notificationCode} has been expired`, color: 'success' })
     emit('success')
     open.value = false
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err as { data?: { message?: string }, message?: string }
     toast.add({
       title: 'Error',
-      description: err.data?.message || err.message || 'Failed to expire notification',
+      description: error.data?.message || error.message || 'Failed to expire notification',
       color: 'error'
     })
   } finally {

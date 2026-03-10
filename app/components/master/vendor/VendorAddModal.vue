@@ -15,7 +15,13 @@ const open = ref(false)
 
 type Schema = z.output<typeof schema>
 
-const state = reactive<Partial<Schema>>({
+const state = reactive<{
+  code: string
+  name: string
+  requiredPhotos: Schema['requiredPhotos']
+  requiredFields: Schema['requiredFields']
+  isActive: boolean
+}>({
   code: '',
   name: '',
   requiredPhotos: [],
@@ -54,10 +60,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     emit('success')
     resetState()
     open.value = false
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string }, message?: string }
     toast.add({
       title: 'Error',
-      description: error.data?.message || 'Failed to create vendor',
+      description: err.data?.message || err.message || 'Failed to create vendor',
       color: 'error'
     })
   } finally {
@@ -65,8 +72,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   }
 }
 
-const photoOptions = [...PHOTO_TYPES]
-const fieldOptions = [...FIELD_NAMES]
+const photoOptions = [...PHOTO_TYPES] as Schema['requiredPhotos']
+const fieldOptions = [...FIELD_NAMES] as Schema['requiredFields']
 </script>
 
 <template>
