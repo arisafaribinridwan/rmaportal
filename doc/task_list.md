@@ -32,7 +32,7 @@
   - Status saat ini: auth server/client sudah terpasang
   - Cakupan yang sudah ada: session 7 hari, rate limit login, RBAC role `ADMIN`/`MANAGEMENT`/`QRCC`/`CS`
 
-- [/] **#6** Buat auth middleware & route protection
+- [x] **#6** Buat auth middleware & route protection
   - Module backend: `server/api/auth/[...all].ts`, `server/utils/auth-helpers.ts`
   - Module frontend: `app/middleware/auth.global.ts`, `app/middleware/dashboard.ts`, `app/middleware/cs.ts`
   - Status saat ini: auth route dan helper sudah ada, namun proteksi global belum aktif penuh
@@ -47,7 +47,7 @@
     - Validasi `event.context.auth` selalu terisi di endpoint yang butuh auth
     - Tambahkan catatan fallback untuk route yang belum siap agar tidak me-redirect ke halaman placeholder yang rusak
 
-- [/] **#7** Buat halaman Login & Profile
+- [x] **#7** Buat halaman Login & Profile
   - Module login: `app/pages/login.vue`
   - Module profile/settings: `app/pages/dashboard/settings/index.vue`, `app/pages/dashboard/settings/security.vue`
   - Status saat ini: UI login dan profile/settings sudah ada, tapi belum terhubung ke auth flow riil
@@ -65,7 +65,7 @@
 
 ## Phase 2 — Master Data Management
 
-- [/] **#8** Setup shared infrastructure
+- [x] **#8** Setup shared infrastructure
   - Module layout: `app/layouts/dashboard.vue`, `app/layouts/cs.vue`
   - Module composable: `app/composables/useAuth.ts`
   - Module shared contract: `shared/utils/constants.ts`, `shared/types/database.ts`

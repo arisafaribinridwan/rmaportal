@@ -5,17 +5,17 @@
 import { useAuth } from '~/composables/useAuth'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-  // disable middleware sementara untuk fix ui dulu
-  return
-
   // Skip di server-side untuk menghindari hydration mismatch
   if (import.meta.server) return
 
   const { isLoggedIn, getHomePath } = useAuth()
 
-  // Daftar route yang bisa diakses tanpa login
+  // Route yang bisa diakses tanpa login
   const publicRoutes = ['/login']
   const isPublic = publicRoutes.some(r => to.path === r || to.path.startsWith(r + '/'))
+
+  // Auth API routes — jangan intercept
+  if (to.path.startsWith('/api/auth')) return
 
   // Belum login & bukan public route → redirect ke /login
   if (!isLoggedIn.value && !isPublic) {

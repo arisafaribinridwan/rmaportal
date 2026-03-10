@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
+import { authClient } from '~/utils/auth-client'
+import { useAuth } from '~/composables/useAuth'
+
+definePageMeta({
+  layout: false
+})
+
+const { getHomePath } = useAuth()
 
 const fields = ref<AuthFormField[]>([
   {
@@ -18,14 +26,6 @@ const fields = ref<AuthFormField[]>([
     placeholder: 'Enter your password',
     size: 'xl',
     required: true
-  },
-  // In Nuxt UI v3/v4 this will render as text hint next to the label.
-  // We can also potentially use slots if supported, but this is the simplest built-in way.
-  // description: 'Forget Password?' },
-  {
-    name: 'remember',
-    type: 'checkbox',
-    label: 'Remember me'
   }
 ])
 
@@ -36,8 +36,35 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>
 
-const onSubmit = async (data: FormSubmitEvent<Schema>) => {
-  console.log('Login Submitted', data)
+const loading = ref(false)
+const errorMessage = ref('')
+
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+  loading.value = true
+  errorMessage.value = ''
+
+  try {
+    const { data, error } = await authClient.signIn.email({
+      email: event.data.email,
+      password: event.data.password
+    })
+
+    if (error) {
+      errorMessage.value = error.message ?? 'Login failed. Please check your credentials.'
+      return
+    }
+
+    if (data) {
+      // Redirect ke home sesuai role setelah login sukses
+      await navigateTo(getHomePath(), { replace: true })
+    }
+  } catch (err: unknown) {
+    errorMessage.value = err instanceof Error
+      ? err.message
+      : 'An unexpected error occurred. Please try again.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -51,7 +78,6 @@ const onSubmit = async (data: FormSubmitEvent<Schema>) => {
       <div class="space-y-8">
         <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
           Official Portal for <br>
-          <!-- The text color matches the primary brand color from the image -->
           <span class="text-indigo-500">RMA Panel System</span> <br>
           Management
         </h1>
@@ -93,23 +119,32 @@ const onSubmit = async (data: FormSubmitEvent<Schema>) => {
 
       <!-- Right Section: AuthForm Area -->
       <div class="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
-        <!-- Flex container to align the button top-right relative to the form area -->
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-8 shadow-sm">
+          <!-- Error Alert -->
+          <div
+            v-if="errorMessage"
+            class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm flex items-center gap-2"
+          >
+            <UIcon name="i-lucide-alert-circle" class="w-4 h-4 shrink-0" />
+            {{ errorMessage }}
+          </div>
+
           <UAuthForm
             :schema="schema"
             title="Welcome back"
             description="Enter your credentials to access your account."
             :fields="fields"
-            :submit="{ label: 'Sign In', color: 'success', block: true, size: 'xl', class: 'mt-6 font-medium rounded-xl' }"
+            :submit="{
+              label: loading ? 'Signing in...' : 'Sign In',
+              color: 'success',
+              block: true,
+              size: 'xl',
+              class: 'mt-6 font-medium rounded-xl',
+              disabled: loading,
+              loading: loading
+            }"
             @submit="onSubmit"
-          >
-            <!-- Custom Slot approach if needed -->
-            <template #password-hint>
-              <NuxtLink to="/forgot-password" class="text-sm font-medium text-indigo-500 hover:text-indigo-600">
-                Forget Password?
-              </NuxtLink>
-            </template>
-          </UAuthForm>
+          />
         </div>
       </div>
     </div>

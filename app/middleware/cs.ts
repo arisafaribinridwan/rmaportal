@@ -5,9 +5,6 @@
 import { useAuth } from '~/composables/useAuth'
 
 export default defineNuxtRouteMiddleware(() => {
-  // disable middleware sementara untuk fix ui dulu
-  return
-
   if (import.meta.server) return
 
   const { role } = useAuth()

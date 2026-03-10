@@ -36,7 +36,7 @@
 
 ## P1 — Kerjakan Sekarang
 
-- [/] `#6` Auth middleware & route protection
+- [x] `#6` Auth middleware & route protection
   - File kunci: `server/api/auth/[...all].ts`, `server/utils/auth-helpers.ts`, `app/middleware/auth.global.ts`
   - Hasil yang diharapkan:
     - proteksi route aktif
@@ -45,7 +45,7 @@
   - Blocker saat ini:
     - `app/middleware/auth.global.ts` masih disable
 
-- [/] `#7` Login & Profile
+- [x] `#7` Login & Profile
   - File kunci: `app/pages/login.vue`, `app/pages/dashboard/settings/index.vue`, `app/pages/dashboard/settings/security.vue`
   - Hasil yang diharapkan:
     - login submit pakai auth client
@@ -55,7 +55,7 @@
     - login masih `console.log`
     - profile masih template umum
 
-- [/] `#8` Shared infrastructure
+- [x] `#8` Shared infrastructure
   - File kunci: `app/layouts/dashboard.vue`, `app/layouts/cs.vue`, `app/composables/useAuth.ts`, `shared/utils/constants.ts`, `shared/types/database.ts`
   - Hasil yang diharapkan:
     - navigasi hanya memuat route yang valid

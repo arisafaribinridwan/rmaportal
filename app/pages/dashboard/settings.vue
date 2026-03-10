@@ -1,20 +1,35 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import { useAuth } from '~/composables/useAuth'
 
-const links = [[{
-  label: 'General',
-  icon: 'i-lucide-user',
-  to: '/dashboard/settings',
-  exact: true
-}, {
-  label: 'Members',
-  icon: 'i-lucide-users',
-  to: '/dashboard/settings/members'
-}, {
-  label: 'Security',
-  icon: 'i-lucide-shield',
-  to: '/dashboard/settings/security'
-}]] satisfies NavigationMenuItem[][]
+const { role } = useAuth()
+
+const links = computed<NavigationMenuItem[][]>(() => {
+  const items: NavigationMenuItem[] = [
+    {
+      label: 'General',
+      icon: 'i-lucide-user',
+      to: '/dashboard/settings',
+      exact: true
+    },
+    {
+      label: 'Security',
+      icon: 'i-lucide-shield',
+      to: '/dashboard/settings/security'
+    }
+  ]
+
+  // Users management tab — ADMIN only
+  if (role.value === 'ADMIN') {
+    items.splice(1, 0, {
+      label: 'Users',
+      icon: 'i-lucide-users',
+      to: '/dashboard/settings/users'
+    })
+  }
+
+  return [items]
+})
 </script>
 
 <template>
@@ -27,7 +42,6 @@ const links = [[{
       </UDashboardNavbar>
 
       <UDashboardToolbar>
-        <!-- NOTE: The `-mx-1` class is used to align with the `DashboardSidebarCollapse` button here. -->
         <UNavigationMenu :items="links" highlight class="-mx-1 flex-1" />
       </UDashboardToolbar>
     </template>
