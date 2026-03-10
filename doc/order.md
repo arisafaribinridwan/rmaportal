@@ -1,43 +1,50 @@
-- [x] `#9` Vendor CRUD Backend
-  - File kunci: `server/api/master/vendor/*.ts`, `server/api/master/vendors.ts`, `server/services/vendor.service.ts`
-  - Outcome:
-    - endpoint final jelas
-    - endpoint dummy tidak lagi jadi sumber utama
+- [ ] **#17** CS Claim List (Backend) — API `GET /claims`
+  - Module target: `server/api/claims/index.get.ts` atau struktur sejenis
+  - Status saat ini: endpoint list claim CS belum ditemukan
+  - Checklist teknis lanjutan:
+    - Tentukan route final untuk list claim CS
+    - Definisikan filter minimum: status, date range, branch, keyword
+    - Sertakan summary field yang dibutuhkan list UI
+    - Terapkan role guard untuk CS
+    - Siapkan pagination bila volume data diperkirakan besar
 
-- [x] `#10` Vendor CRUD Frontend
-  - File kunci: `app/pages/dashboard/master/vendor.vue`, `app/components/master/vendor/*.vue`
-  - Outcome:
-    - table pakai endpoint final
-    - add/edit/delete benar-benar mutate backend
+- [/] **#18** CS Claim List UI (Frontend)
+  - Module page: `app/pages/cs/index.vue`, `app/pages/cs/claim/index.vue`, `app/pages/cs/claim/[id].vue`
+  - Status saat ini: landing page CS sudah ada, tetapi list/detail claim masih placeholder
+  - Checklist teknis lanjutan:
+    - Putuskan peran `app/pages/cs/index.vue`: hero page atau langsung list claim
+    - Implement table/list claim di `app/pages/cs/claim/index.vue`
+    - Isi `app/pages/cs/claim/[id].vue` dengan detail claim aktual
+    - Tambahkan link navigasi yang konsisten dari layout CS ke halaman claim
+    - Samakan naming route `/cs/claim` vs `/cs/Claims` yang masih tidak konsisten di layout
 
-- [x] `#11` Product Model CRUD Backend
-  - File kunci: `server/api/master/product-model/*.ts`, `server/api/master/product-models.ts`, `server/services/product-model.service.ts`
-  - Outcome:
-    - route list/detail final konsisten
+- [ ] **#19** Claim Wizard Create (Backend) — Lookup, draft, submit, upload foto
+  - Module target: route dan service claim di `server/api` + `server/services`
+  - Status saat ini: backend claim wizard belum ditemukan
+  - Checklist teknis lanjutan:
+    - Definisikan endpoint lookup notification/model/vendor/defect
+    - Definisikan endpoint create draft claim
+    - Definisikan endpoint submit claim
+    - Definisikan endpoint upload photo per tipe foto
+    - Tentukan validasi required photo/field berdasarkan vendor
 
-- [x] `#12` Product Model CRUD Frontend
-  - File kunci: `app/pages/dashboard/master/product-model.vue`, `app/components/master/product-model/*.vue`
-  - Outcome:
-    - UI tidak lagi bergantung ke data dummy
+- [/] **#20** Claim Wizard Create UI (Frontend)
+  - Module page: `app/pages/cs/claim/create.vue`
+  - Status saat ini: route sudah ada, isi masih placeholder
+  - Checklist teknis lanjutan:
+    - Pecah wizard menjadi step input notification, detail unit, defect, dan upload foto
+    - Tentukan state management lokal untuk draft claim
+    - Tampilkan field dinamis berdasarkan vendor dan notification
+    - Tambahkan validasi sebelum submit per step
+    - Tambahkan save draft bila flow backend mendukung
 
-- [x] `#13` Defect Master CRUD Backend
-  - File kunci: `server/api/master/defect/*.ts`, `server/api/master/defects.ts`, `server/services/defect-master.service.ts`
-  - Outcome:
-    - validasi unik dan status update final
-
-- [x] `#14` Defect Master CRUD Frontend
-  - File kunci: `app/pages/dashboard/master/defect.vue`, `app/components/master/defect/*.vue`
-  - Outcome:
-    - CRUD UI tersambung backend final
-
-- [x] `#15` Notification Master CRUD + Excel Import Backend
-  - File kunci: `server/api/master/notification/*.ts`, `server/api/master/notifications.ts`, `server/services/notification-master.service.ts`
-  - Outcome:
-    - CRUD final jelas
-    - scope import Excel diputuskan
-
-- [x] `#16` Notification Master CRUD + Excel Import Frontend
-  - File kunci: `app/pages/dashboard/master/notification.vue`, `app/components/master/notification/*.vue`
-  - Outcome:
-    - list pakai backend final
-    - import UI punya arah implementasi
+- [ ] **#21** Claim Revision Flow (Backend & Frontend)
+  - Module target backend: endpoint revision claim
+  - Module target frontend: `app/pages/cs/claim/[id]/edit.vue`
+  - Status saat ini: endpoint dan halaman revision belum ditemukan
+  - Checklist teknis lanjutan:
+    - Definisikan status yang mengizinkan revision
+    - Buat endpoint untuk submit revision
+    - Siapkan halaman edit claim berdasarkan data lama
+    - Tandai field/foto mana yang perlu diperbaiki
+    - Tampilkan riwayat alasan revision dari reviewer
