@@ -1,16 +1,23 @@
 <script setup lang="ts">
+import { size } from 'zod';
+
+
 const fields = [
   {
     name: 'email',
     type: 'email',
     label: 'Email',
-    placeholder: 'Enter your email'
+    placeholder: 'Enter your email',
+    size: 'xl',
+    required: true
   },
   {
     name: 'password',
     type: 'password',
     label: 'Password',
-    placeholder: 'Enter your password'
+    placeholder: 'Enter your password',
+    size: 'xl',
+    required: true
   },
   // In Nuxt UI v3/v4 this will render as text hint next to the label.
   // We can also potentially use slots if supported, but this is the simplest built-in way.
@@ -28,11 +35,11 @@ const onSubmit = (data: unknown) => {
 </script>
 
 <template>
-  <div class="min-h-screen relative flex items-center justify-center bg-gray-50/50 dark:bg-gray-950 p-6">
-    <div class="absolute right-1/5 top-4">
+  <div class="min-h-screen relative flex flex-col items-center justify-center bg-gray-50/50 dark:bg-gray-950 p-6">
+    <div class="justify-end w-full max-w-6xl flex flex-none">
       <UColorModeButton />
     </div>
-    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center grow">
       <!-- Left Section: Branding and Information -->
       <div class="space-y-8">
         <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
@@ -81,13 +88,9 @@ const onSubmit = (data: unknown) => {
       <div class="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
         <!-- Flex container to align the button top-right relative to the form area -->
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-8 shadow-sm">
-          <UAuthForm
-            title="Welcome back"
-            description="Enter your credentials to access your account."
-            :fields="fields"
+          <UAuthForm title="Welcome back" description="Enter your credentials to access your account." :fields="fields"
             :submit="{ label: 'Sign In', color: 'success', block: true, size: 'xl', class: 'mt-6 font-medium rounded-xl' }"
-            @submit="onSubmit"
-          >
+            @submit="onSubmit">
             <!-- Custom Slot approach if needed -->
             <template #password-hint>
               <NuxtLink to="/forgot-password" class="text-sm font-medium text-indigo-500 hover:text-indigo-600">
