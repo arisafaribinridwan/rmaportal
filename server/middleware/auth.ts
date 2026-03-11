@@ -77,7 +77,6 @@ function findRouteRule(path: string): RouteRule | undefined {
 // ────────────────────────────────────────────────────────────
 
 export default defineEventHandler(async (event: H3Event) => {
-  return // Disable auth middleware temporarily
   const path = getRequestURL(event).pathname
 
   // 1) Skip non-API requests (pages, assets, _nuxt, etc.)

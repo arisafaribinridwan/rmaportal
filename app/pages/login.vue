@@ -4,6 +4,16 @@ import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 import { authClient } from '~/utils/auth-client'
 import { useAuth } from '~/composables/useAuth'
 
+// Prevent hydration mismatch by defining refs before accessing auth state
+const loading = ref(false)
+const errorMessage = ref('')
+const isHydrated = ref(false)
+
+// Set hydrated state on mounted to prevent SSR/CSR mismatch
+onMounted(() => {
+  isHydrated.value = true
+})
+
 definePageMeta({
   layout: false
 })
@@ -35,9 +45,6 @@ const schema = z.object({
 })
 
 type Schema = z.output<typeof schema>
-
-const loading = ref(false)
-const errorMessage = ref('')
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   loading.value = true
@@ -71,7 +78,9 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 <template>
   <div class="min-h-screen relative flex flex-col items-center justify-center bg-gray-50/50 dark:bg-gray-950 p-6">
     <div class="justify-end w-full max-w-6xl flex flex-none">
-      <UColorModeButton />
+      <client-only>
+        <UColorModeButton />
+      </client-only>
     </div>
     <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center grow">
       <!-- Left Section: Branding and Information -->
@@ -129,22 +138,29 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             {{ errorMessage }}
           </div>
 
-          <UAuthForm
-            :schema="schema"
-            title="Welcome back"
-            description="Enter your credentials to access your account."
-            :fields="fields"
-            :submit="{
-              label: loading ? 'Signing in...' : 'Sign In',
-              color: 'success',
-              block: true,
-              size: 'xl',
-              class: 'mt-6 font-medium rounded-xl',
-              disabled: loading,
-              loading: loading
-            }"
-            @submit="onSubmit"
-          />
+          <ClientOnly>
+            <UAuthForm
+              :schema="schema"
+              title="Welcome back"
+              description="Enter your credentials to access your account."
+              :fields="fields"
+              :submit="{
+                label: loading ? 'Signing in...' : 'Sign In',
+                color: 'success',
+                block: true,
+                size: 'xl',
+                class: 'mt-6 font-medium rounded-xl',
+                disabled: loading,
+                loading: loading
+              }"
+              @submit="onSubmit"
+            />
+            <template #fallback>
+              <div class="p-8 flex justify-center items-center">
+                <USkeleton class="h-12 w-full rounded-xl" />
+              </div>
+            </template>
+          </ClientOnly>
         </div>
       </div>
     </div>

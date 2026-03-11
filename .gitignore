@@ -29,3 +29,4 @@ logs
 .claude
 .config
 opencode.json
+local.db
