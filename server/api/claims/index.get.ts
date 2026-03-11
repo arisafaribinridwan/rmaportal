@@ -16,6 +16,16 @@ export default defineEventHandler(async (event) => {
     filters.status = query.status as ClaimStatus
   }
 
+  // Filter: statuses (comma-separated, e.g. ?statuses=SUBMITTED,IN_REVIEW)
+  if (typeof query.statuses === 'string' && query.statuses.trim()) {
+    const parsed = query.statuses.split(',')
+      .map(s => s.trim())
+      .filter(s => CLAIM_STATUSES.includes(s as ClaimStatus)) as ClaimStatus[]
+    if (parsed.length > 0) {
+      filters.statuses = parsed
+    }
+  }
+
   // Filter: branch
   if (typeof query.branch === 'string' && query.branch.trim()) {
     filters.branch = query.branch.trim()
