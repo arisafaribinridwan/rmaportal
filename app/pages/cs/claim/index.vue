@@ -15,14 +15,25 @@ const columnVisibility = ref()
 const rowSelection = ref({})
 
 interface ClaimListItem {
-  id: string
+  id: number
+  claimNumber: string
   notificationCode: string
   modelName: string
-  status: 'DRAFT' | 'SUBMITTED' | 'NEED_REVISION' | 'APPROVED' | 'ARCHIVED'
+  claimStatus: 'DRAFT' | 'SUBMITTED' | 'IN_REVIEW' | 'NEED_REVISION' | 'APPROVED' | 'ARCHIVED'
   createdAt: string
 }
 
-const { data, status } = await useFetch<ClaimListItem[]>('/api/claims', {
+interface ClaimListResponse {
+  data: ClaimListItem[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+const { data, status } = await useFetch<ClaimListResponse>('/api/claims', {
   lazy: true
 })
 
@@ -40,7 +51,7 @@ const columns: TableColumn<ClaimListItem>[] = [
     header: 'Model Name'
   },
   {
-    accessorKey: 'status',
+    accessorKey: 'claimStatus',
     header: 'Status',
     filterFn: 'equals',
     cell: ({ row }) => {
@@ -48,11 +59,12 @@ const columns: TableColumn<ClaimListItem>[] = [
       const statusMap: Record<string, { label: string, color: BadgeColor }> = {
         DRAFT: { label: 'Draft', color: 'neutral' },
         SUBMITTED: { label: 'Submitted', color: 'info' },
+        IN_REVIEW: { label: 'In Review', color: 'secondary' },
         NEED_REVISION: { label: 'Need Revision', color: 'warning' },
         APPROVED: { label: 'Approved', color: 'success' },
         ARCHIVED: { label: 'Archived', color: 'neutral' }
       }
-      const s = statusMap[row.original.status] || { label: row.original.status, color: 'neutral' }
+      const s = statusMap[row.original.claimStatus] || { label: row.original.claimStatus, color: 'neutral' }
       return h(UBadge, { class: 'capitalize', variant: 'subtle', color: s.color }, () => s.label)
     }
   },
@@ -88,7 +100,7 @@ const statusFilter = ref('all')
 watch(() => statusFilter.value, (newVal) => {
   if (!table?.value?.tableApi) return
 
-  const statusColumn = table.value.tableApi.getColumn('status')
+  const statusColumn = table.value.tableApi.getColumn('claimStatus')
   if (!statusColumn) return
 
   if (newVal === 'all') {
@@ -145,6 +157,7 @@ const pagination = ref({
               { label: 'All Status', value: 'all' },
               { label: 'Draft', value: 'DRAFT' },
               { label: 'Submitted', value: 'SUBMITTED' },
+              { label: 'In Review', value: 'IN_REVIEW' },
               { label: 'Need Revision', value: 'NEED_REVISION' },
               { label: 'Approved', value: 'APPROVED' },
               { label: 'Archived', value: 'ARCHIVED' }
@@ -166,7 +179,7 @@ const pagination = ref({
           getPaginationRowModel: getPaginationRowModel()
         }"
         class="shrink-0"
-        :data="data || []"
+        :data="data?.data || []"
         :columns="columns"
         :loading="status === 'pending'"
         :ui="{

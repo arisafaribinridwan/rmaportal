@@ -7,16 +7,17 @@ const toast = useToast()
 const claimId = route.params.id as string
 
 interface ClaimDetail {
-  id: string
+  id: number
+  claimNumber: string
   notificationCode: string
   modelName: string
   inch?: string | number
   branch?: string
-  status: 'DRAFT' | 'SUBMITTED' | 'NEED_REVISION' | 'APPROVED' | 'ARCHIVED'
+  claimStatus: 'DRAFT' | 'SUBMITTED' | 'IN_REVIEW' | 'NEED_REVISION' | 'APPROVED' | 'ARCHIVED'
   createdAt: string
   panelSerialNo: string
   ocSerialNo: string
-  defectId: number
+  defectCode: string
 }
 
 const { data: claim, status } = await useFetch<ClaimDetail>(`/api/claims/${claimId}`, {
@@ -27,7 +28,7 @@ const { data: claim, status } = await useFetch<ClaimDetail>(`/api/claims/${claim
 const schemaRevision = z.object({
   panelSerialNo: z.string().min(1, 'Panel Serial No. is required'),
   ocSerialNo: z.string().min(1, 'OC Serial No. is required'),
-  defectId: z.number().min(1, 'Defect is required'),
+  defectCode: z.string().min(1, 'Defect is required'),
   odfNumber: z.string().optional(),
   version: z.string().optional(),
   week: z.string().optional()
@@ -38,7 +39,7 @@ type SchemaRevision = z.output<typeof schemaRevision>
 const stateRevision = reactive<Partial<SchemaRevision>>({
   panelSerialNo: undefined,
   ocSerialNo: undefined,
-  defectId: undefined,
+  defectCode: undefined,
   odfNumber: undefined,
   version: undefined,
   week: undefined
@@ -61,9 +62,9 @@ const qrccReviewNotes = ref<{ field: string, note: string, type: 'field' | 'phot
 ])
 
 const defects = ref([
-  { id: 1, name: 'Panel Blank' },
-  { id: 2, name: 'Line Defect' },
-  { id: 3, name: 'Physical Damage' }
+  { code: 'PANEL_BLANK', name: 'Panel Blank' },
+  { code: 'LINE_DEFECT', name: 'Line Defect' },
+  { code: 'PHYSICAL_DAMAGE', name: 'Physical Damage' }
 ])
 
 // Populate state once claim is loaded
@@ -71,7 +72,7 @@ watch(claim, (newClaim) => {
   if (newClaim) {
     stateRevision.panelSerialNo = newClaim.panelSerialNo
     stateRevision.ocSerialNo = newClaim.ocSerialNo
-    stateRevision.defectId = newClaim.defectId
+    stateRevision.defectCode = newClaim.defectCode
     // other fields...
   }
 }, { immediate: true })
@@ -221,18 +222,18 @@ const _photoLabels: Record<string, string> = {
                 </template>
               </UFormField>
 
-              <UFormField name="defectId" label="Defect Type">
+              <UFormField name="defectCode" label="Defect Type">
                 <USelect
-                  v-model="stateRevision.defectId"
+                  v-model="stateRevision.defectCode"
                   :items="defects"
                   option-attribute="name"
-                  value-attribute="id"
-                  :ui="{ base: isFieldRejected('defectId') ? 'ring-2 ring-red-500 dark:ring-red-400' : '' }"
+                  value-attribute="code"
+                  :ui="{ base: isFieldRejected('defectCode') ? 'ring-2 ring-red-500 dark:ring-red-400' : '' }"
                 />
-                <template v-if="isFieldRejected('defectId')" #help>
+                <template v-if="isFieldRejected('defectCode')" #help>
                   <span class="text-red-500 text-xs font-medium flex items-center gap-1 mt-1">
                     <UIcon name="i-lucide-alert-circle" class="w-3 h-3" />
-                    {{ getFieldRejectNote('defectId') }}
+                    {{ getFieldRejectNote('defectCode') }}
                   </span>
                 </template>
               </UFormField>

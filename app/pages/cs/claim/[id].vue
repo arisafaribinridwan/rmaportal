@@ -5,11 +5,12 @@ const claimId = route.params.id as string
 type BadgeColor = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral'
 
 interface ClaimDetail {
-  id: string
+  id: number
+  claimNumber: string
   notificationCode: string
   modelName: string
   branch?: string
-  status: 'DRAFT' | 'SUBMITTED' | 'NEED_REVISION' | 'APPROVED' | 'ARCHIVED'
+  claimStatus: 'DRAFT' | 'SUBMITTED' | 'IN_REVIEW' | 'NEED_REVISION' | 'APPROVED' | 'ARCHIVED'
   createdAt: string
   panelSerialNo: string
   ocSerialNo: string
@@ -28,6 +29,7 @@ const items = [{
 const statusMap: Record<string, { label: string, color: BadgeColor }> = {
   DRAFT: { label: 'Draft', color: 'neutral' },
   SUBMITTED: { label: 'Submitted', color: 'info' },
+  IN_REVIEW: { label: 'In Review', color: 'secondary' },
   NEED_REVISION: { label: 'Need Revision', color: 'warning' },
   APPROVED: { label: 'Approved', color: 'success' },
   ARCHIVED: { label: 'Archived', color: 'neutral' }
@@ -35,7 +37,7 @@ const statusMap: Record<string, { label: string, color: BadgeColor }> = {
 
 const claimStatus = computed(() => {
   if (!claim.value) return { label: 'Unknown', color: 'neutral' as BadgeColor }
-  return statusMap[claim.value.status] || { label: claim.value.status, color: 'neutral' as BadgeColor }
+  return statusMap[claim.value.claimStatus] || { label: claim.value.claimStatus, color: 'neutral' as BadgeColor }
 })
 </script>
 
@@ -52,7 +54,7 @@ const claimStatus = computed(() => {
       />
       <div>
         <h1 class="text-2xl font-bold font-inter flex items-center gap-2">
-          Claim {{ claimId }}
+          Claim {{ claim?.claimNumber || claimId }}
           <UBadge
             v-if="claim"
             :color="claimStatus.color"

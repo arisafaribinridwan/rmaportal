@@ -1,50 +1,56 @@
-- [ ] **#17** CS Claim List (Backend) — API `GET /claims`
-  - Module target: `server/api/claims/index.get.ts` atau struktur sejenis
-  - Status saat ini: endpoint list claim CS belum ditemukan
-  - Checklist teknis lanjutan:
-    - Tentukan route final untuk list claim CS
-    - Definisikan filter minimum: status, date range, branch, keyword
-    - Sertakan summary field yang dibutuhkan list UI
-    - Terapkan role guard untuk CS
-    - Siapkan pagination bila volume data diperkirakan besar
+- [x] **#17** CS Claim List (Backend) — API `GET /api/claims`
+  - Modul aktual: `server/api/claims/index.get.ts` + `server/repositories/claim.repo.ts`
+  - Status saat ini: endpoint list sudah tersedia dan terpakai
+  - Cakupan yang sudah ada:
+    - Filter: `status`, `branch`, `vendorId`, `keyword`, `dateFrom`, `dateTo`
+    - Pagination: `page`, `limit` (response menyertakan `pagination`)
+    - Summary field list UI sudah tersedia (claim number, notification/model/vendor, defect, status, timestamps)
+    - Role guard mengikuti middleware auth global (CS/QRCC/ADMIN)
 
-- [/] **#18** CS Claim List UI (Frontend)
-  - Module page: `app/pages/cs/index.vue`, `app/pages/cs/claim/index.vue`, `app/pages/cs/claim/[id].vue`
-  - Status saat ini: landing page CS sudah ada, tetapi list/detail claim masih placeholder
-  - Checklist teknis lanjutan:
-    - Putuskan peran `app/pages/cs/index.vue`: hero page atau langsung list claim
-    - Implement table/list claim di `app/pages/cs/claim/index.vue`
-    - Isi `app/pages/cs/claim/[id].vue` dengan detail claim aktual
-    - Tambahkan link navigasi yang konsisten dari layout CS ke halaman claim
-    - Samakan naming route `/cs/claim` vs `/cs/Claims` yang masih tidak konsisten di layout
+- [x] **#18** CS Claim List UI (Frontend)
+  - Modul aktual: `app/pages/cs/index.vue`, `app/pages/cs/claim/index.vue`, `app/pages/cs/claim/[id].vue`, `app/layouts/cs.vue`
+  - Status saat ini: list/detail page sudah terhubung dengan kontrak backend yang aktif
+  - Cakupan yang sudah ada:
+    - `app/pages/cs/index.vue` dipakai sebagai hero + pintu masuk ke create claim
+    - `app/pages/cs/claim/index.vue` sudah menampilkan tabel, filter UI, aksi ke detail
+    - `app/pages/cs/claim/[id].vue` sudah menampilkan overview/detail klaim
+    - Navigasi layout CS sudah mengarah ke `/cs/claim` dan konsisten (tidak ada `/cs/Claims`)
+    - Kontrak response list sudah sinkron dengan backend (`{ data, pagination }`)
+    - Mapping field backend vs frontend sudah seragam untuk status (`claimStatus`) pada list/detail
 
-- [ ] **#19** Claim Wizard Create (Backend) — Lookup, draft, submit, upload foto
-  - Module target: route dan service claim di `server/api` + `server/services`
-  - Status saat ini: backend claim wizard belum ditemukan
-  - Checklist teknis lanjutan:
-    - Definisikan endpoint lookup notification/model/vendor/defect
-    - Definisikan endpoint create draft claim
-    - Definisikan endpoint submit claim
-    - Definisikan endpoint upload photo per tipe foto
-    - Tentukan validasi required photo/field berdasarkan vendor
+- [x] **#19** Claim Wizard Create (Backend) — Lookup, draft, submit, upload foto
+  - Modul aktual: `server/api/claims/**` + `server/services/claim.service.ts`
+  - Status saat ini: flow backend wizard sudah tersedia
+  - Cakupan yang sudah ada:
+    - Lookup endpoint: notifications/models/vendors/defects di `server/api/claims/lookup/*`
+    - Draft endpoint: `POST /api/claims` (create) dan `PUT /api/claims/:id` (update draft)
+    - Submit endpoint: `PUT /api/claims/:id/submit`
+    - Upload foto endpoint: `POST /api/claims/:id/photos` (+ delete photo)
+    - Validasi vendor required fields/photos sudah diterapkan di service
 
 - [/] **#20** Claim Wizard Create UI (Frontend)
-  - Module page: `app/pages/cs/claim/create.vue`
-  - Status saat ini: route sudah ada, isi masih placeholder
-  - Checklist teknis lanjutan:
-    - Pecah wizard menjadi step input notification, detail unit, defect, dan upload foto
-    - Tentukan state management lokal untuk draft claim
-    - Tampilkan field dinamis berdasarkan vendor dan notification
-    - Tambahkan validasi sebelum submit per step
-    - Tambahkan save draft bila flow backend mendukung
+  - Modul aktual: `app/pages/cs/claim/create.vue`
+  - Status saat ini: wizard multi-step sudah terbangun, tapi masih dominan mock dan belum terhubung penuh ke API backend
+  - Cakupan yang sudah ada:
+    - Step wizard sudah dipisah: notification/detail defect, upload foto, review
+    - State management lokal draft sudah ada
+    - Validasi per step dan required photos sudah ada di sisi UI
+    - Field/foto dinamis berdasarkan vendor sudah ada (dari state lokal)
+  - Gap yang masih perlu sinkronisasi:
+    - Source lookup vendor/defect/notification masih hardcoded/mock di page
+    - Aksi save draft dan submit masih simulasi (toast + `navigateTo`), belum call endpoint backend
+    - Upload foto belum memakai endpoint `/api/claims/:id/photos`
 
-- [ ] **#21** Claim Revision Flow (Backend & Frontend)
-  - Module target backend: endpoint revision claim
-  - Module target frontend: `app/pages/cs/claim/[id]/edit.vue`
-  - Status saat ini: endpoint dan halaman revision belum ditemukan
-  - Checklist teknis lanjutan:
-    - Definisikan status yang mengizinkan revision
-    - Buat endpoint untuk submit revision
-    - Siapkan halaman edit claim berdasarkan data lama
-    - Tandai field/foto mana yang perlu diperbaiki
-    - Tampilkan riwayat alasan revision dari reviewer
+- [/] **#21** Claim Revision Flow (Backend & Frontend)
+  - Modul backend aktual: `server/api/claims/[id]/revise.put.ts`, `server/api/claims/[id]/history.get.ts`, `server/services/claim.service.ts`
+  - Modul frontend aktual: `app/pages/cs/claim/[id]/edit.vue`
+  - Status saat ini: backend revision flow sudah ada; frontend revision page sudah ada tetapi masih mock-heavy
+  - Cakupan yang sudah ada:
+    - Status yang diizinkan revision sudah ditetapkan (`NEED_REVISION`)
+    - Endpoint submit revision sudah tersedia (`PUT /api/claims/:id/revise`)
+    - Halaman edit claim sudah mengambil data klaim awal
+    - UI penandaan field/foto rejected sudah ada
+  - Gap yang masih perlu sinkronisasi:
+    - Catatan reject dan daftar foto rejected masih mock statis di frontend
+    - Submit revision di frontend masih simulasi, belum call endpoint revise
+    - Riwayat alasan revision belum ditarik dari endpoint history untuk ditampilkan sebagai sumber utama
