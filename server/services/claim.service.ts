@@ -1,6 +1,7 @@
 // server/services/claim.service.ts
 import { z } from 'zod'
-import { claimRepo, type ClaimListFilters } from '~~/server/repositories/claim.repo'
+import { claimRepo } from '~~/server/repositories/claim.repo'
+import type { ClaimListFilters } from '~~/server/repositories/claim.repo'
 import { sequenceGeneratorRepo } from '~~/server/repositories/sequence-generator.repo'
 import { notificationMasterRepo } from '~~/server/repositories/notification-master.repo'
 import { vendorRepo } from '~~/server/repositories/vendor.repo'
