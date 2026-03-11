@@ -52,7 +52,7 @@ const claimStatus = computed(() => {
         size="sm"
         class="shrink-0"
       />
-      <div>
+      <div class="flex-1">
         <h1 class="text-2xl font-bold font-inter flex items-center gap-2">
           Claim {{ claim?.claimNumber || claimId }}
           <UBadge
@@ -65,6 +65,15 @@ const claimStatus = computed(() => {
           </UBadge>
         </h1>
       </div>
+      <UButton
+        v-if="claim?.claimStatus === 'NEED_REVISION'"
+        :to="`/cs/claim/${claimId}/edit`"
+        icon="i-lucide-pen-line"
+        color="warning"
+        variant="soft"
+      >
+        Revise Claim
+      </UButton>
     </div>
 
     <UCard v-if="status === 'pending'" class="flex-1">
