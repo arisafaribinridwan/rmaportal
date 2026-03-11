@@ -1,0 +1,32 @@
+- [x] **#22** QRCC Claims Dashboard (Backend) — API review klaim
+  - Module target: route review claims untuk dashboard QRCC
+  - Checklist teknis lanjutan:
+    - [x] Definisikan endpoint list claim untuk reviewer
+    - [x] Tambahkan filter per status review
+    - [x] Sertakan data foto dan ringkasan defect untuk review cepat
+    - [x] Pastikan hanya role QRCC/Admin yang bisa akses
+
+- [x] **#23** QRCC Claims Dashboard UI (Frontend) — 3-Tab Interface `app/pages/dashboard/claims/[id].vue`
+  - Module target: `app/pages/dashboard/claims/index.vue`, `app/pages/dashboard/claims/[id].vue`
+  - Checklist teknis lanjutan:
+    - [x] Siapkan halaman list claim QRCC
+    - [x] Siapkan detail dengan tab ringkasan, foto review, dan history
+    - [x] Sinkronkan route dengan menu dashboard
+    - [x] Tambahkan status badge dan action panel review
+
+- [x] **#24** Photo Review (Backend) — Kalkulasi status akhir
+  - Module target: service review foto dan finalisasi status claim
+  - Checklist teknis lanjutan:
+    - [x] Definisikan aturan lulus/gagal tiap foto
+    - [x] Simpan hasil review per foto
+    - [x] Hitung status akhir claim dari hasil review
+    - [x] Tulis audit history untuk setiap keputusan review
+
+- [x] **#25** Audit Trail (Backend & Frontend) — List `ClaimHistory`, export Excel `app/pages/dashboard/audit-trail.vue`
+  - Module target backend: endpoint claim history + export
+  - Module target frontend: `app/pages/dashboard/audit-trail.vue`
+  - Checklist teknis lanjutan:
+    - [x] Buat endpoint list history
+    - [x] Buat filter berdasarkan action, user, tanggal, claim number
+    - [x] Tambahkan export sesuai kebutuhan management
+    - [x] Siapkan page audit trail di dashboard

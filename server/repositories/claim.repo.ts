@@ -1,5 +1,5 @@
 // server/repositories/claim.repo.ts
-import { eq, desc, and, gte, lte, count, sql, type SQL } from 'drizzle-orm'
+import { eq, desc, and, gte, lte, count, sql, inArray, type SQL } from 'drizzle-orm'
 import db from '~~/server/database'
 import {
   claim,
@@ -15,6 +15,7 @@ import type { ClaimStatus, PhotoType } from '~~/shared/utils/constants'
 
 export interface ClaimListFilters {
   status?: ClaimStatus
+  statuses?: ClaimStatus[]
   branch?: string
   vendorId?: number
   keyword?: string
@@ -32,7 +33,9 @@ export const claimRepo = {
   async findAll(filters?: ClaimListFilters) {
     const conditions: SQL[] = []
 
-    if (filters?.status) {
+    if (filters?.statuses && filters.statuses.length > 0) {
+      conditions.push(inArray(claim.claimStatus, filters.statuses))
+    } else if (filters?.status) {
       conditions.push(eq(claim.claimStatus, filters.status))
     }
 
