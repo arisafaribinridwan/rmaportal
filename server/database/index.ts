@@ -12,4 +12,5 @@ import * as schema from './schema'
 const db = drizzle({ connection: { url: process.env.DB_FILE_NAME! || 'file:local.db' }, schema })
 
 export type db = typeof db
+export type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 export default db

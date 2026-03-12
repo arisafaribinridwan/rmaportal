@@ -347,30 +347,6 @@
 
 ---
 
-## Prioritas Eksekusi Disarankan
-
-- **P1 — Selesaikan fondasi auth dan shared flow**
-  - Task `#6`, `#7`, `#8`
-  - Alasan: tanpa auth aktif dan layout/navigation yang rapi, modul lain akan sulit divalidasi end-to-end
-
-- **P2 — Finalkan satu pola CRUD master data lalu replikasi**
-  - Task `#9` s.d. `#16`
-  - Alasan: backend dan frontend sudah setengah jadi; pola vendor/product model/defect/notification bisa diseragamkan
-
-- **P3 — Bangun CS claim flow minimum viable**
-  - Task `#17` s.d. `#21`
-  - Alasan: ini alur bisnis inti yang akan membuka kebutuhan QRCC, vendor claim, audit, dan reports
-
-- **P4 — Lanjutkan reviewer, vendor claim, dan reporting**
-  - Task `#22` s.d. `#31`
-  - Alasan: modul ini bergantung pada claim flow yang sudah stabil
-
-- **P5 — Tutup dengan testing dan polish**
-  - Task `#32`
-  - Alasan: dilakukan setelah alur utama dan kontrak endpoint tidak banyak berubah lagi
-
----
-
 > **Cara baca status:**
 > - `[ ]` Belum dikerjakan
 > - `[/]` Sudah mulai / sebagian selesai / masih perlu integrasi

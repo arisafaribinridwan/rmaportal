@@ -1,6 +1,7 @@
 // server/repositories/vendor-claim.repo.ts
 import { eq, desc, and, count, notInArray, type SQL } from 'drizzle-orm'
 import db from '~~/server/database'
+import type { db as DbClient, DbTransaction } from '~~/server/database'
 import {
   vendorClaim,
   vendorClaimItem,
@@ -110,7 +111,7 @@ export const vendorClaimRepo = {
    * Insert a new vendor claim.
    * Uses Drizzle's native table infer type for proper timestamp handling.
    */
-  async create(data: typeof vendorClaim.$inferInsert, executor: any = db) {
+  async create(data: typeof vendorClaim.$inferInsert, executor: DbClient | DbTransaction = db) {
     return executor
       .insert(vendorClaim)
       .values(data)
@@ -121,7 +122,7 @@ export const vendorClaimRepo = {
   /**
    * Update a vendor claim by ID.
    */
-  async update(id: number, data: Partial<typeof vendorClaim.$inferInsert>, executor: any = db) {
+  async update(id: number, data: Partial<typeof vendorClaim.$inferInsert>, executor: DbClient | DbTransaction = db) {
     return executor
       .update(vendorClaim)
       .set(data)
@@ -136,7 +137,7 @@ export const vendorClaimRepo = {
    * Bulk insert vendor claim items.
    * Uses Drizzle's native table infer type for proper timestamp handling.
    */
-  async createItems(items: (typeof vendorClaimItem.$inferInsert)[], executor: any = db) {
+  async createItems(items: (typeof vendorClaimItem.$inferInsert)[], executor: DbClient | DbTransaction = db) {
     return executor
       .insert(vendorClaimItem)
       .values(items)
@@ -179,7 +180,7 @@ export const vendorClaimRepo = {
    * included in any vendor claim batch.
    * Uses NOT IN subquery to exclude claims already in vendor_claim_item.
    */
-  async findApprovedClaimsForVendor(vendorId: number, executor: any = db) {
+  async findApprovedClaimsForVendor(vendorId: number, executor: DbClient | DbTransaction = db) {
     // Get claim IDs already in vendor_claim_item
     const existingClaimIds = await executor
       .select({ claimId: vendorClaimItem.claimId })
@@ -225,7 +226,7 @@ export const vendorClaimRepo = {
   /**
    * Record a claim history entry (used when generating vendor claim).
    */
-  async createClaimHistory(data: InsertClaimHistory, executor: any = db) {
+  async createClaimHistory(data: InsertClaimHistory, executor: DbClient | DbTransaction = db) {
     return executor
       .insert(claimHistory)
       .values(data)

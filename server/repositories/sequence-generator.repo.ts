@@ -1,6 +1,7 @@
 // server/repositories/sequence-generator.repo.ts
 import { eq, and } from 'drizzle-orm'
 import db from '~~/server/database'
+import type { db as DbClient, DbTransaction } from '~~/server/database'
 import { sequenceGenerator } from '~~/server/database/schema'
 import type { SequenceType } from '~~/shared/utils/constants'
 
@@ -12,7 +13,7 @@ export const sequenceGeneratorRepo = {
    *
    * Format: CLM-YYYYMMDD-XXXX (e.g. CLM-20260311-0001)
    */
-  async getNextSequence(type: SequenceType, date: Date, executor: any = db): Promise<string> {
+  async getNextSequence(type: SequenceType, date: Date, executor: DbClient | DbTransaction = db): Promise<string> {
     const dateStr = formatDate(date) // YYYYMMDD
 
     // Try to find existing sequence for this type + date
