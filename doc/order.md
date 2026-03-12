@@ -1,32 +1,24 @@
-- [x] **#22** QRCC Claims Dashboard (Backend) — API review klaim
-  - Module target: route review claims untuk dashboard QRCC
+- [x] **#26** Vendor Claim Generate (Backend) — Seleksi klaim APPROVED
+  - Module target: service generate vendor claim
   - Checklist teknis lanjutan:
-    - [x] Definisikan endpoint list claim untuk reviewer
-    - [x] Tambahkan filter per status review
-    - [x] Sertakan data foto dan ringkasan defect untuk review cepat
-    - [x] Pastikan hanya role QRCC/Admin yang bisa akses
+    - Tentukan rule grouping claim per vendor
+    - Generate nomor vendor claim dari sequence
+    - Simpan item claim yang tergabung
+    - Catat history generate vendor claim
 
-- [x] **#23** QRCC Claims Dashboard UI (Frontend) — 3-Tab Interface `app/pages/dashboard/claims/[id].vue`
-  - Module target: `app/pages/dashboard/claims/index.vue`, `app/pages/dashboard/claims/[id].vue`
+- [ ] **#27** Vendor Claim UI (Frontend) — Wizard 3 step `app/pages/dashboard/vendor-claims/create.vue`
+  - Module target: halaman create vendor claim
   - Checklist teknis lanjutan:
-    - [x] Siapkan halaman list claim QRCC
-    - [x] Siapkan detail dengan tab ringkasan, foto review, dan history
-    - [x] Sinkronkan route dengan menu dashboard
-    - [x] Tambahkan status badge dan action panel review
+    - Buat step seleksi vendor
+    - Buat step seleksi approved claims
+    - Buat step review dan submit vendor claim
+    - Sinkronkan route dengan menu dashboard
 
-- [x] **#24** Photo Review (Backend) — Kalkulasi status akhir
-  - Module target: service review foto dan finalisasi status claim
+- [ ] **#28** Vendor Decision Input (Backend & Frontend) — Input ACCEPTED/REJECTED
+  - Module target backend: endpoint keputusan vendor
+  - Module target frontend: halaman/detail vendor claim
   - Checklist teknis lanjutan:
-    - [x] Definisikan aturan lulus/gagal tiap foto
-    - [x] Simpan hasil review per foto
-    - [x] Hitung status akhir claim dari hasil review
-    - [x] Tulis audit history untuk setiap keputusan review
-
-- [x] **#25** Audit Trail (Backend & Frontend) — List `ClaimHistory`, export Excel `app/pages/dashboard/audit-trail.vue`
-  - Module target backend: endpoint claim history + export
-  - Module target frontend: `app/pages/dashboard/audit-trail.vue`
-  - Checklist teknis lanjutan:
-    - [x] Buat endpoint list history
-    - [x] Buat filter berdasarkan action, user, tanggal, claim number
-    - [x] Tambahkan export sesuai kebutuhan management
-    - [x] Siapkan page audit trail di dashboard
+    - Definisikan payload keputusan per item claim
+    - Simpan tanggal dan user input keputusan
+    - Update status vendor claim aggregate
+    - Tampilkan hasil accepted/rejected di UI

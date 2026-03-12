@@ -12,11 +12,11 @@ export const sequenceGeneratorRepo = {
    *
    * Format: CLM-YYYYMMDD-XXXX (e.g. CLM-20260311-0001)
    */
-  async getNextSequence(type: SequenceType, date: Date): Promise<string> {
+  async getNextSequence(type: SequenceType, date: Date, executor: any = db): Promise<string> {
     const dateStr = formatDate(date) // YYYYMMDD
 
     // Try to find existing sequence for this type + date
-    const existing = await db
+    const existing = await executor
       .select()
       .from(sequenceGenerator)
       .where(and(eq(sequenceGenerator.type, type), eq(sequenceGenerator.currentDate, dateStr)))
@@ -26,15 +26,33 @@ export const sequenceGeneratorRepo = {
 
     if (existing) {
       nextSeq = existing.lastSequence + 1
-      await db
+      await executor
         .update(sequenceGenerator)
         .set({ lastSequence: nextSeq })
         .where(eq(sequenceGenerator.id, existing.id))
     } else {
       nextSeq = 1
-      await db
-        .insert(sequenceGenerator)
-        .values({ type, currentDate: dateStr, lastSequence: nextSeq })
+      try {
+        await executor
+          .insert(sequenceGenerator)
+          .values({ type, currentDate: dateStr, lastSequence: nextSeq })
+      } catch {
+        const latest = await executor
+          .select()
+          .from(sequenceGenerator)
+          .where(and(eq(sequenceGenerator.type, type), eq(sequenceGenerator.currentDate, dateStr)))
+          .get()
+
+        if (!latest) {
+          throw createError({ statusCode: 500, message: 'Failed to generate sequence number' })
+        }
+
+        nextSeq = latest.lastSequence + 1
+        await executor
+          .update(sequenceGenerator)
+          .set({ lastSequence: nextSeq })
+          .where(eq(sequenceGenerator.id, latest.id))
+      }
     }
 
     // Build formatted sequence

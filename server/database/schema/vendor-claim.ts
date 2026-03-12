@@ -13,8 +13,8 @@ export const vendorClaim = sqliteTable('vendor_claim', {
   submittedAt: integer({ mode: 'timestamp_ms' }).notNull(),
   reportSnapshot: text().notNull(), // JSON data stored as text
   status: text().notNull().$type<typeof VENDOR_CLAIM_STATUSES[number]>(),
-  createdBy: integer().notNull(),
-  updatedBy: integer().notNull(),
+  createdBy: text().notNull(),
+  updatedBy: text().notNull(),
   createdAt: integer({ mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
@@ -35,8 +35,8 @@ export const insertVendorClaimSchema = createInsertSchema(vendorClaim, {
   submittedAt: z.number().int(),
   reportSnapshot: z.string(),
   status: z.enum(VENDOR_CLAIM_STATUSES),
-  createdBy: z.number().int().positive(),
-  updatedBy: z.number().int().positive()
+  createdBy: z.string().min(1, 'Created by is required'),
+  updatedBy: z.string().min(1, 'Updated by is required')
 }).omit({
   id: true,
   createdAt: true,
