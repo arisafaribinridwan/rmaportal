@@ -271,7 +271,7 @@
 
 ## Phase 5 — Vendor Claim
 
-- [ ] **#26** Vendor Claim Generate (Backend) — Seleksi klaim APPROVED
+- [x] **#26** Vendor Claim Generate (Backend) — Seleksi klaim APPROVED
   - Module target: service generate vendor claim
   - Checklist teknis lanjutan:
     - Tentukan rule grouping claim per vendor

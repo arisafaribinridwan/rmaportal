@@ -1,6 +1,6 @@
 // server/database/schema/vendor-claim-item.ts
 import { sql } from 'drizzle-orm'
-import { sqliteTable, integer, text, index } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, integer, text, index, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 import { vendorClaim } from './vendor-claim'
@@ -25,7 +25,8 @@ export const vendorClaimItem = sqliteTable('vendor_claim_item', {
     .$onUpdateFn(() => new Date())
 }, table => [
   index('vendor_claim_item_vendor_claim_idx').on(table.vendorClaimId),
-  index('vendor_claim_item_claim_idx').on(table.claimId)
+  index('vendor_claim_item_claim_idx').on(table.claimId),
+  uniqueIndex('vendor_claim_item_claim_unique_idx').on(table.claimId)
 ])
 
 export const insertVendorClaimItemSchema = createInsertSchema(vendorClaimItem, {
