@@ -578,7 +578,7 @@ const photoLabels: Record<string, string> = {
           <div v-for="photoType in requiredPhotos" :key="photoType" class="flex flex-col">
             <label class="text-sm font-medium mb-2">{{ photoLabels[photoType] || photoType }}<span class="text-red-500 ml-1">*</span></label>
             <div
-              class="relative flex-1 group min-h-[160px] rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center p-4 transition-colors hover:border-primary peer-focus-within:border-primary overflow-hidden"
+              class="relative flex-1 group min-h-40 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center p-4 transition-colors hover:border-primary peer-focus-within:border-primary overflow-hidden"
               :class="{ 'bg-gray-50 dark:bg-gray-800/50': !stateStep2[photoType], 'border-solid border-gray-200 dark:border-gray-700': stateStep2[photoType] }"
             >
               <input
