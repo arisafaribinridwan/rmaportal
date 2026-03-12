@@ -190,8 +190,8 @@ CREATE TABLE `vendor_claim` (
 	`submittedAt` integer NOT NULL,
 	`reportSnapshot` text NOT NULL,
 	`status` text NOT NULL,
-	`createdBy` integer NOT NULL,
-	`updatedBy` integer NOT NULL,
+	`createdBy` text NOT NULL,
+	`updatedBy` text NOT NULL,
 	`createdAt` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`updatedAt` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	FOREIGN KEY (`vendorId`) REFERENCES `vendor`(`id`) ON UPDATE no action ON DELETE restrict
@@ -219,6 +219,7 @@ CREATE TABLE `vendor_claim_item` (
 --> statement-breakpoint
 CREATE INDEX `vendor_claim_item_vendor_claim_idx` ON `vendor_claim_item` (`vendorClaimId`);--> statement-breakpoint
 CREATE INDEX `vendor_claim_item_claim_idx` ON `vendor_claim_item` (`claimId`);--> statement-breakpoint
+CREATE UNIQUE INDEX `vendor_claim_item_claim_unique_idx` ON `vendor_claim_item` (`claimId`);--> statement-breakpoint
 CREATE TABLE `claim_history` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`claimId` integer NOT NULL,

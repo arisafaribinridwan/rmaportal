@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d007c46e-f663-4fa9-9695-bc4452811d11",
+  "id": "58b1ec42-d8d4-4f80-b316-bfcadbb03f11",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "vendor": {
@@ -1345,14 +1345,14 @@
         },
         "createdBy": {
           "name": "createdBy",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "updatedBy": {
           "name": "updatedBy",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -1520,6 +1520,13 @@
             "claimId"
           ],
           "isUnique": false
+        },
+        "vendor_claim_item_claim_unique_idx": {
+          "name": "vendor_claim_item_claim_unique_idx",
+          "columns": [
+            "claimId"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {
