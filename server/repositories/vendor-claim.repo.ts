@@ -131,6 +131,18 @@ export const vendorClaimRepo = {
       .get()
   },
 
+  /**
+   * Update a vendor claim status.
+   */
+  async updateStatus(id: number, status: VendorClaimStatus, updatedBy: string, executor: DbClient | DbTransaction = db) {
+    return executor
+      .update(vendorClaim)
+      .set({ status, updatedBy })
+      .where(eq(vendorClaim.id, id))
+      .returning()
+      .get()
+  },
+
   // ── Vendor Claim Items ────────────────────────────────────
 
   /**
@@ -142,6 +154,18 @@ export const vendorClaimRepo = {
       .insert(vendorClaimItem)
       .values(items)
       .returning()
+  },
+
+  /**
+   * Update a single vendor claim item.
+   */
+  async updateItemDecision(itemId: number, data: Partial<typeof vendorClaimItem.$inferInsert>, executor: DbClient | DbTransaction = db) {
+    return executor
+      .update(vendorClaimItem)
+      .set(data)
+      .where(eq(vendorClaimItem.id, itemId))
+      .returning()
+      .get()
   },
 
   /**

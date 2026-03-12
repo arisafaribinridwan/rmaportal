@@ -225,5 +225,89 @@ export const vendorClaimService = {
 
       throw error
     }
+  },
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // #28 — Vendor Decision Input
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /**
+   * Update decision for a vendor claim item.
+   */
+  async updateItemDecision(vendorClaimId: number, itemId: number, body: unknown, userId: string, userRole: string) {
+    const updateItemDecisionSchema = z.object({
+      vendorDecision: z.enum(['ACCEPTED', 'REJECTED']),
+      compensation: z.number().int().nonnegative().optional().nullable(),
+      rejectReason: z.string().optional().nullable()
+    }).superRefine((data, ctx) => {
+      if (data.vendorDecision === 'ACCEPTED' && (data.compensation === undefined || data.compensation === null)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Compensation is required when accepted', path: ['compensation'] })
+      }
+      if (data.vendorDecision === 'REJECTED' && !data.rejectReason) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Reject reason is required when rejected', path: ['rejectReason'] })
+      }
+    })
+
+    const data = updateItemDecisionSchema.parse(body)
+
+    return await db.transaction(async (tx) => {
+      // 1. Validate the Vendor Claim exists
+      const vc = await vendorClaimRepo.findById(vendorClaimId)
+      if (!vc) {
+        throw createError({ statusCode: 404, message: 'Vendor claim not found' })
+      }
+
+      // 2. Validate the item exists and belongs to the Vendor Claim
+      const items = await vendorClaimRepo.findItemsByVendorClaimId(vendorClaimId)
+      const item = items.find(i => i.id === itemId)
+      if (!item) {
+        throw createError({ statusCode: 404, message: 'Vendor claim item not found' })
+      }
+
+      const now = new Date()
+
+      // 3. Update the item decision
+      await vendorClaimRepo.updateItemDecision(itemId, {
+        vendorDecision: data.vendorDecision,
+        compensation: data.compensation || undefined,
+        rejectReason: data.rejectReason || undefined,
+        vendorDecisionBy: parseInt(userId) || 1, // Store user ID based on column spec
+        vendorDecisionAt: now
+      }, tx)
+
+      // 4. Record claim history
+      await vendorClaimRepo.createClaimHistory({
+        claimId: item.claimId,
+        action: 'UPDATE_VENDOR_DECISION',
+        fromStatus: 'APPROVED',
+        toStatus: 'APPROVED',
+        userId,
+        userRole,
+        note: `Vendor decision marked as ${data.vendorDecision} for item ${itemId}`
+      }, tx)
+
+      // 5. Check if all items are decided to update vendor claim status
+      // We refetch items in the transaction
+      const updatedItems = await tx.query.vendorClaimItem.findMany({
+        where: (fields, { eq }) => eq(fields.vendorClaimId, vendorClaimId)
+      })
+
+      const allDecided = updatedItems.every(i => i.vendorDecision !== 'PENDING')
+      const someDecided = updatedItems.some(i => i.vendorDecision !== 'PENDING')
+
+      let newStatus: 'CREATED' | 'PROCESSING' | 'COMPLETED' | 'DRAFT' = vc.status
+
+      if (allDecided) {
+        newStatus = 'COMPLETED'
+      } else if (someDecided && vc.status === 'CREATED') {
+        newStatus = 'PROCESSING'
+      }
+
+      if (newStatus !== vc.status) {
+        await vendorClaimRepo.updateStatus(vendorClaimId, newStatus, userId, tx)
+      }
+
+      return { success: true, newStatus }
+    })
   }
 }

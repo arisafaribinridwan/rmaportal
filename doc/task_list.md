@@ -279,7 +279,7 @@
     - Simpan item claim yang tergabung
     - Catat history generate vendor claim
 
-- [ ] **#27** Vendor Claim UI (Frontend) — Wizard 3 step `app/pages/dashboard/vendor-claims/create.vue`
+- [x] **#27** Vendor Claim UI (Frontend) — Wizard 3 step `app/pages/dashboard/vendor-claims/create.vue`
   - Module target: halaman create vendor claim
   - Checklist teknis lanjutan:
     - Buat step seleksi vendor
@@ -287,7 +287,7 @@
     - Buat step review dan submit vendor claim
     - Sinkronkan route dengan menu dashboard
 
-- [ ] **#28** Vendor Decision Input (Backend & Frontend) — Input ACCEPTED/REJECTED
+- [x] **#28** Vendor Decision Input (Backend & Frontend) — Input ACCEPTED/REJECTED
   - Module target backend: endpoint keputusan vendor
   - Module target frontend: halaman/detail vendor claim
   - Checklist teknis lanjutan:
