@@ -88,6 +88,17 @@ const links = computed<NavigationMenuItem[][]>(() => {
     })
   }
 
+  // User Management — ADMIN only (dedicated menu item)
+  if (role.value === 'ADMIN') {
+    mainLinks.push({
+      label: 'User Management',
+      icon: 'i-lucide-users',
+      to: '/dashboard/users',
+      exact: true,
+      onSelect: () => { open.value = false }
+    })
+  }
+
   // Settings — all dashboard roles
   const settingsChildren: NavigationMenuItem[] = [
     {
@@ -103,16 +114,6 @@ const links = computed<NavigationMenuItem[][]>(() => {
       onSelect: () => { open.value = false }
     }
   ]
-
-  // Users management — ADMIN only
-  if (role.value === 'ADMIN') {
-    settingsChildren.splice(1, 0, {
-      label: 'Users',
-      to: '/dashboard/settings/users',
-      exact: true,
-      onSelect: () => { open.value = false }
-    })
-  }
 
   mainLinks.push({
     label: 'Settings',

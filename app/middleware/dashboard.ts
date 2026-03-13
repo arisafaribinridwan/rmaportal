@@ -13,7 +13,7 @@ import type { UserRole } from '~~/shared/utils/constants'
  */
 const ROUTE_ACCESS: { pattern: string, roles: UserRole[] }[] = [
   // User Management — Admin only
-  { pattern: '/dashboard/settings/users', roles: ['ADMIN'] },
+  { pattern: '/dashboard/users', roles: ['ADMIN'] },
 
   // Claims Management — QRCC + Admin
   { pattern: '/dashboard/claims', roles: ['QRCC', 'ADMIN'] },

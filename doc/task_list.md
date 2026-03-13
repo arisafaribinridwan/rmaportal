@@ -300,7 +300,7 @@
 
 ## Phase 6 — Management & Admin
 
-- [/] **#29** User Management (Backend & Frontend) — `app/pages/dashboard/users.vue`
+- [x] **#29** User Management (Backend & Frontend) — `app/pages/dashboard/users.vue`
   - Module auth/role existing: `server/utils/auth.ts`
   - Module frontend existing terkait settings: `app/pages/dashboard/settings/members.vue`
   - Status saat ini: role admin di auth sudah ada, tetapi user management RMA belum jadi module khusus

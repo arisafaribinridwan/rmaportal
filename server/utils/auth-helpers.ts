@@ -28,6 +28,14 @@ export async function requireAuth(event: H3Event) {
     })
   }
 
+  // Block inactive users — enforce pada semua request, bukan hanya role-based
+  if (session.user.isActive === false) {
+    throw createError({
+      statusCode: 403,
+      message: 'Forbidden — User account is inactive'
+    })
+  }
+
   event.context.auth = session
   return session
 }

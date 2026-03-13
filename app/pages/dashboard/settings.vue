@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
-import { useAuth } from '~/composables/useAuth'
-
-const { role } = useAuth()
 
 const links = computed<NavigationMenuItem[][]>(() => {
   const items: NavigationMenuItem[] = [
@@ -18,15 +15,6 @@ const links = computed<NavigationMenuItem[][]>(() => {
       to: '/dashboard/settings/security'
     }
   ]
-
-  // Users management tab — ADMIN only
-  if (role.value === 'ADMIN') {
-    items.splice(1, 0, {
-      label: 'Users',
-      icon: 'i-lucide-users',
-      to: '/dashboard/settings/users'
-    })
-  }
 
   return [items]
 })
