@@ -1,8 +1,64 @@
-- [x] **#28** Vendor Decision Input (Backend & Frontend) — Input ACCEPTED/REJECTED
-  - Module target backend: endpoint keputusan vendor
-  - Module target frontend: halaman/detail vendor claim
+- [/] **#29** User Management (Backend & Frontend) — `app/pages/dashboard/users.vue`
+  - Module auth/role existing: `server/utils/auth.ts`
+  - Module frontend belum ada.
+  - Status saat ini: role admin di auth sudah ada, tetapi user management RMA belum jadi module khusus
   - Checklist teknis lanjutan:
-    - Definisikan payload keputusan per item claim
-    - Simpan tanggal dan user input keputusan
-    - Update status vendor claim aggregate
-    - Tampilkan hasil accepted/rejected di UI
+    - `app/pages/dashboard/users.vue`
+      - buat dedicated page user management dengan route final `/dashboard/users`
+      - tampilkan tabel semua user dengan filter `All / Active / Inactive`
+      - tampilkan aksi per row: ubah role, activate/deactivate
+      - blok aksi untuk akun admin yang sedang login
+    - `app/layouts/dashboard.vue`
+      - ubah menu lama `/dashboard/settings/users` menjadi `/dashboard/users`
+      - tampilkan menu User Management hanya untuk role `ADMIN`
+    - `app/pages/dashboard/settings.vue`
+      - sinkronkan link users agar mengarah ke `/dashboard/users`
+      - pastikan tidak ada referensi route lama
+    - `app/middleware/dashboard.ts`
+      - ubah guard route user management dari `/dashboard/settings/users` ke `/dashboard/users`
+      - pastikan hanya `ADMIN` yang bisa akses route page ini
+    - `app/components/users/UserCreateModal.vue`
+      - buat modal create user
+      - field: `name`, `email`, `username`, `role`, `branch`
+      - `branch` wajib jika role = `CS`
+      - setelah sukses tampilkan info default password system
+    - `app/components/users/UserRoleModal.vue`
+      - buat modal edit role user
+      - hanya mengubah `role`
+      - tolak perubahan ke `CS` jika target user tidak punya `branch`
+    - `app/components/users/UserStatusModal.vue`
+      - buat modal activate/deactivate user
+      - status nonaktif harus berarti user tidak boleh login lagi
+      - blok self-disable
+    - `app/types/user-management.ts` atau type shared setara
+      - buat type khusus user management agar tidak bentrok dengan type dummy di `app/types/index.d.ts`
+      - siapkan shape data list user dan payload create/update
+    - `server/api/users/index.get.ts`
+      - implement list user untuk admin
+      - response minimum: `id`, `name`, `email`, `username`, `role`, `branch`, `isActive`, `createdAt`
+    - `server/api/users/index.post.ts`
+      - implement create user admin-only
+      - gunakan default password dari `shared/utils/constants.ts`
+      - validasi `branch` wajib jika role `CS`
+      - response sukses perlu mendukung UI menampilkan info password awal
+    - `server/api/users/[id].patch.ts`
+      - implement update parsial untuk `role` dan `isActive`
+      - blok self-update untuk role/status aktif
+      - tolak role `CS` jika user target tidak punya `branch`
+    - `server/services/user-management.service.ts`
+      - pusatkan business logic list/create/update user
+      - jaga validasi rule admin, self-update, role CS, dan status aktif
+    - `server/repositories/user-management.repo.ts` jika diperlukan
+      - pisahkan query tabel user agar handler dan service tetap tipis
+    - `server/middleware/auth.ts` atau flow auth terkait
+      - pastikan prefix `/api/users` tetap admin-only
+      - pastikan user nonaktif ditolak aksesnya pada request berikutnya
+    - `server/utils/auth.ts` dan integrasi auth terkait
+      - gunakan jalur auth yang valid untuk create user agar akun bisa login normal
+      - jangan hanya insert manual bila berisiko merusak flow auth
+    - Verifikasi akhir
+      - admin bisa akses page dan API user management
+      - non-admin tidak bisa akses page maupun API
+      - create user CS tanpa branch ditolak
+      - edit role ke CS tanpa branch ditolak
+      - deactivate user memutus akses pada request berikutnya
