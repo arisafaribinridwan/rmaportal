@@ -1,64 +1,48 @@
-- [/] **#29** User Management (Backend & Frontend) — `app/pages/dashboard/users.vue`
-  - Module auth/role existing: `server/utils/auth.ts`
-  - Module frontend belum ada.
-  - Status saat ini: role admin di auth sudah ada, tetapi user management RMA belum jadi module khusus
+- [/] **#30** Dashboard Overview & Statistik — Chart unovis `app/pages/dashboard/index.vue`
+  - Module page: `app/pages/dashboard/index.vue`
+  - Module komponen: `app/components/home/HomeStats.vue`, `app/components/home/HomeChart.server.vue`, `app/components/home/HomeChart.client.vue`, `app/components/home/HomeSales.vue`
+  - Status saat ini: shell dashboard dan komponen statistik sudah ada, tapi masih template generik
+  - Keputusan MVP:
+    - KPI: `Submitted`, `Need Revision`, `Approved`, `Vendor Claim Pending`, `Total Claims`
+    - `Vendor Claim Pending`: item/vendor claim yang sudah dibatch dan masih menunggu keputusan vendor
+    - Chart utama: tren `Submitted` + `Approved`
+    - Filter `date range` + `period` hanya untuk KPI dan chart
+    - Tabel bawah: 1 card dengan tabs `Latest Claims`, `Recent Review Activity`, `Pending Vendor Claim Items`
+    - Setiap tab tampil maksimal 5 item terbaru
+    - Dashboard sama untuk semua role yang dapat akses `/dashboard`
+  - Implementasi teknis sederhana per file:
+    - `app/pages/dashboard/index.vue`
+      - Ubah title/header ke konteks dashboard RMA
+      - Hapus shortcut/action generik yang tidak relevan
+      - Pertahankan filter periode untuk KPI + chart
+    - `app/components/home/HomeStats.vue`
+      - Ganti data dummy ke summary KPI RMA dari backend
+      - Pertahankan pola card + variation seperti template saat ini
+    - `app/components/home/HomeChart.server.vue`
+      - Ubah placeholder/header dari revenue ke tren claim RMA
+    - `app/components/home/HomeChart.client.vue`
+      - Ganti data random ke data trend aktual
+      - Ubah chart menjadi 2 seri: `Submitted` dan `Approved`
+      - Ubah tooltip/label dari currency ke jumlah claim
+    - `app/components/home/HomeSales.vue`
+      - Ganti tabel sales dummy menjadi card bertab
+      - Isi tab: `Latest Claims`, `Recent Review Activity`, `Pending Vendor Claim Items`
+    - `server/api/dashboard/summary.get.ts`
+      - Endpoint KPI dashboard dengan filter range/period
+    - `server/api/dashboard/trend.get.ts`
+      - Endpoint trend dashboard untuk seri `Submitted` + `Approved`
+    - `server/api/dashboard/latest.get.ts`
+      - Endpoint data latest untuk 3 tab dashboard
+    - `server/services/dashboard.service.ts`
+      - Service agregasi data summary, trend, dan latest tabs
+    - `server/repositories/claim.repo.ts`
+      - Helper query KPI claim, trend claim, latest claims, recent review activity
+    - `server/repositories/vendor-claim.repo.ts`
+      - Helper query pending vendor claim items terbaru
   - Checklist teknis lanjutan:
-    - `app/pages/dashboard/users.vue`
-      - buat dedicated page user management dengan route final `/dashboard/users`
-      - tampilkan tabel semua user dengan filter `All / Active / Inactive`
-      - tampilkan aksi per row: ubah role, activate/deactivate
-      - blok aksi untuk akun admin yang sedang login
-    - `app/layouts/dashboard.vue`
-      - ubah menu lama `/dashboard/settings/users` menjadi `/dashboard/users`
-      - tampilkan menu User Management hanya untuk role `ADMIN`
-    - `app/pages/dashboard/settings.vue`
-      - sinkronkan link users agar mengarah ke `/dashboard/users`
-      - pastikan tidak ada referensi route lama
-    - `app/middleware/dashboard.ts`
-      - ubah guard route user management dari `/dashboard/settings/users` ke `/dashboard/users`
-      - pastikan hanya `ADMIN` yang bisa akses route page ini
-    - `app/components/users/UserCreateModal.vue`
-      - buat modal create user
-      - field: `name`, `email`, `username`, `role`, `branch`
-      - `branch` wajib jika role = `CS`
-      - setelah sukses tampilkan info default password system
-    - `app/components/users/UserRoleModal.vue`
-      - buat modal edit role user
-      - hanya mengubah `role`
-      - tolak perubahan ke `CS` jika target user tidak punya `branch`
-    - `app/components/users/UserStatusModal.vue`
-      - buat modal activate/deactivate user
-      - status nonaktif harus berarti user tidak boleh login lagi
-      - blok self-disable
-    - `app/types/user-management.ts` atau type shared setara
-      - buat type khusus user management agar tidak bentrok dengan type dummy di `app/types/index.d.ts`
-      - siapkan shape data list user dan payload create/update
-    - `server/api/users/index.get.ts`
-      - implement list user untuk admin
-      - response minimum: `id`, `name`, `email`, `username`, `role`, `branch`, `isActive`, `createdAt`
-    - `server/api/users/index.post.ts`
-      - implement create user admin-only
-      - gunakan default password dari `shared/utils/constants.ts`
-      - validasi `branch` wajib jika role `CS`
-      - response sukses perlu mendukung UI menampilkan info password awal
-    - `server/api/users/[id].patch.ts`
-      - implement update parsial untuk `role` dan `isActive`
-      - blok self-update untuk role/status aktif
-      - tolak role `CS` jika user target tidak punya `branch`
-    - `server/services/user-management.service.ts`
-      - pusatkan business logic list/create/update user
-      - jaga validasi rule admin, self-update, role CS, dan status aktif
-    - `server/repositories/user-management.repo.ts` jika diperlukan
-      - pisahkan query tabel user agar handler dan service tetap tipis
-    - `server/middleware/auth.ts` atau flow auth terkait
-      - pastikan prefix `/api/users` tetap admin-only
-      - pastikan user nonaktif ditolak aksesnya pada request berikutnya
-    - `server/utils/auth.ts` dan integrasi auth terkait
-      - gunakan jalur auth yang valid untuk create user agar akun bisa login normal
-      - jangan hanya insert manual bila berisiko merusak flow auth
-    - Verifikasi akhir
-      - admin bisa akses page dan API user management
-      - non-admin tidak bisa akses page maupun API
-      - create user CS tanpa branch ditolak
-      - edit role ke CS tanpa branch ditolak
-      - deactivate user memutus akses pada request berikutnya
+    - Ganti source data dummy/template ke data RMA aktual
+    - Sesuaikan label, chart, dan cards agar domain-specific
+    - Hapus shortcut/action dashboard yang tidak relevan dengan RMA
+    - Tambahkan endpoint backend khusus dashboard
+    - Pastikan loading state dan empty state tersedia
+
