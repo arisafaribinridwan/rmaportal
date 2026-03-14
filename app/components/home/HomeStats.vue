@@ -1,76 +1,74 @@
 <script setup lang="ts">
-import type { Period, Range, Stat } from '~/types'
+import type { Period, Range } from '~/types'
 
 const props = defineProps<{
   period: Period
   range: Range
 }>()
 
-function formatCurrency(value: number): string {
-  return value.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-  })
-}
-
-const baseStats = [{
-  title: 'Customers',
-  icon: 'i-lucide-users',
-  minValue: 400,
-  maxValue: 1000,
-  minVariation: -15,
-  maxVariation: 25
-}, {
-  title: 'Conversions',
-  icon: 'i-lucide-chart-pie',
-  minValue: 1000,
-  maxValue: 2000,
-  minVariation: -10,
-  maxVariation: 20
-}, {
-  title: 'Revenue',
-  icon: 'i-lucide-circle-dollar-sign',
-  minValue: 200000,
-  maxValue: 500000,
-  minVariation: -20,
-  maxVariation: 30,
-  formatter: formatCurrency
-}, {
-  title: 'Orders',
-  icon: 'i-lucide-shopping-cart',
-  minValue: 100,
-  maxValue: 300,
-  minVariation: -5,
-  maxVariation: 15
-}]
-
-const { data: stats } = await useAsyncData<Stat[]>('stats', async () => {
-  return baseStats.map((stat) => {
-    const value = randomInt(stat.minValue, stat.maxValue)
-    const variation = randomInt(stat.minVariation, stat.maxVariation)
-
-    return {
-      title: stat.title,
-      icon: stat.icon,
-      value: stat.formatter ? stat.formatter(value) : value,
-      variation
-    }
-  })
-}, {
+const { data: summary } = await useFetch<{
+  totalClaims: number
+  submitted: number
+  needRevision: number
+  approved: number
+  vendorClaimPending: number
+}>('/api/dashboard/summary', {
+  query: computed(() => ({
+    start: props.range.start.toISOString(),
+    end: props.range.end.toISOString()
+  })),
   watch: [() => props.period, () => props.range],
-  default: () => []
+  default: () => ({
+    totalClaims: 0,
+    submitted: 0,
+    needRevision: 0,
+    approved: 0,
+    vendorClaimPending: 0
+  })
 })
+
+const stats = computed(() => [
+  {
+    title: 'Total Claims',
+    icon: 'i-lucide-clipboard-list',
+    value: summary.value.totalClaims,
+    to: '/dashboard/claims'
+  },
+  {
+    title: 'Submitted',
+    icon: 'i-lucide-send',
+    value: summary.value.submitted,
+    to: '/dashboard/claims?status=SUBMITTED'
+  },
+  {
+    title: 'Need Revision',
+    icon: 'i-lucide-alert-circle',
+    value: summary.value.needRevision,
+    to: '/dashboard/claims?status=NEED_REVISION'
+  },
+  {
+    title: 'Approved',
+    icon: 'i-lucide-check-circle',
+    value: summary.value.approved,
+    to: '/dashboard/claims?status=APPROVED'
+  },
+  {
+    title: 'Vendor Claim Pending',
+    icon: 'i-lucide-clock',
+    value: summary.value.vendorClaimPending,
+    color: 'warning'
+  }
+])
 </script>
 
 <template>
-  <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+  <UPageGrid class="lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-px">
     <UPageCard
       v-for="(stat, index) in stats"
       :key="index"
       :icon="stat.icon"
       :title="stat.title"
-      to="/customers"
+      :to="stat.to"
       variant="subtle"
       :ui="{
         container: 'gap-y-1.5',
@@ -84,14 +82,6 @@ const { data: stats } = await useAsyncData<Stat[]>('stats', async () => {
         <span class="text-2xl font-semibold text-highlighted">
           {{ stat.value }}
         </span>
-
-        <UBadge
-          :color="stat.variation > 0 ? 'success' : 'error'"
-          variant="subtle"
-          class="text-xs"
-        >
-          {{ stat.variation > 0 ? '+' : '' }}{{ stat.variation }}%
-        </UBadge>
       </div>
     </UPageCard>
   </UPageGrid>

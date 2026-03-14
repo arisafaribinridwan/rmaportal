@@ -1,112 +1,134 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
-import type { Period, Range, Sale } from '~/types'
-
-const props = defineProps<{
-  period: Period
-  range: Range
-}>()
 
 const UBadge = resolveComponent('UBadge')
 
-const sampleEmails = [
-  'james.anderson@example.com',
-  'mia.white@example.com',
-  'william.brown@example.com',
-  'emma.davis@example.com',
-  'ethan.harris@example.com'
-]
-
-const { data } = await useAsyncData('sales', async () => {
-  const sales: Sale[] = []
-  const currentDate = new Date()
-
-  for (let i = 0; i < 5; i++) {
-    const hoursAgo = randomInt(0, 48)
-    const date = new Date(currentDate.getTime() - hoursAgo * 3600000)
-
-    sales.push({
-      id: (4600 - i).toString(),
-      date: date.toISOString(),
-      status: randomFrom(['paid', 'failed', 'refunded']),
-      email: randomFrom(sampleEmails),
-      amount: randomInt(100, 1000)
-    })
-  }
-
-  return sales.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-}, {
-  watch: [() => props.period, () => props.range],
-  default: () => []
+const { data } = await useFetch<{
+  latestClaims: Record<string, unknown>[]
+  recentReviewActivity: Record<string, unknown>[]
+  pendingVendorClaimItems: Record<string, unknown>[]
+}>('/api/dashboard/latest', {
+  default: () => ({
+    latestClaims: [],
+    recentReviewActivity: [],
+    pendingVendorClaimItems: []
+  })
 })
 
-const columns: TableColumn<Sale>[] = [
+const tabs = [
+  { label: 'Latest Claims', slot: 'latest' },
+  { label: 'Recent Review Activity', slot: 'reviews' },
+  { label: 'Pending Vendor Claim Items', slot: 'vendor' }
+]
+
+const claimColumns: TableColumn<Record<string, unknown>>[] = [
+  { accessorKey: 'claimNumber', header: 'Claim Number' },
   {
-    accessorKey: 'id',
-    header: 'ID',
-    cell: ({ row }) => `#${row.getValue('id')}`
-  },
-  {
-    accessorKey: 'date',
-    header: 'Date',
-    cell: ({ row }) => {
-      return new Date(row.getValue('date')).toLocaleString('en-US', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      })
-    }
-  },
-  {
-    accessorKey: 'status',
+    accessorKey: 'claimStatus',
     header: 'Status',
     cell: ({ row }) => {
-      const color = {
-        paid: 'success' as const,
-        failed: 'error' as const,
-        refunded: 'neutral' as const
-      }[row.getValue('status') as string]
-
-      return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-        row.getValue('status')
-      )
+      const statusColors: Record<string, string> = {
+        DRAFT: 'neutral',
+        SUBMITTED: 'primary',
+        IN_REVIEW: 'info',
+        NEED_REVISION: 'warning',
+        APPROVED: 'success',
+        ARCHIVED: 'neutral'
+      }
+      const status = row.getValue('claimStatus') as string
+      const color = statusColors[status] || 'neutral'
+      return h(UBadge, { color, variant: 'subtle', class: 'capitalize' }, () => status.replace('_', ' '))
     }
   },
+  { accessorKey: 'submittedBy', header: 'Submitted By' },
   {
-    accessorKey: 'email',
-    header: 'Email'
-  },
+    accessorKey: 'createdAt',
+    header: 'Date',
+    cell: ({ row }) => new Date(row.getValue('createdAt')).toLocaleString()
+  }
+]
+
+const reviewColumns: TableColumn<Record<string, unknown>>[] = [
+  { accessorKey: 'claimNumber', header: 'Claim Number' },
+  { accessorKey: 'action', header: 'Action' },
   {
-    accessorKey: 'amount',
-    header: () => h('div', { class: 'text-right' }, 'Amount'),
+    accessorKey: 'statusChange',
+    header: 'Status Change',
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue('amount'))
-
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EUR'
-      }).format(amount)
-
-      return h('div', { class: 'text-right font-medium' }, formatted)
+      const original = row.original as Record<string, string>
+      return `${original.fromStatus} → ${original.toStatus}`
     }
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Date',
+    cell: ({ row }) => new Date(row.getValue('createdAt')).toLocaleString()
+  }
+]
+
+const vendorColumns: TableColumn<Record<string, unknown>>[] = [
+  { accessorKey: 'claimNumber', header: 'Claim Number' },
+  {
+    accessorKey: 'vendorDecision',
+    header: 'Vendor Decision',
+    cell: ({ row }) => h(UBadge, { color: 'warning', variant: 'subtle' }, () => row.getValue('vendorDecision'))
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Pending Since',
+    cell: ({ row }) => new Date(row.getValue('createdAt')).toLocaleString()
   }
 ]
 </script>
 
 <template>
-  <UTable
-    :data="data"
-    :columns="columns"
-    class="shrink-0"
-    :ui="{
-      base: 'table-fixed border-separate border-spacing-0',
-      thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-      tbody: '[&>tr]:last:[&>td]:border-b-0',
-      th: 'first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-      td: 'border-b border-default'
-    }"
-  />
+  <UCard class="shrink-0" :ui="{ body: '!p-0' }">
+    <UTabs :items="tabs" class="w-full">
+      <template #latest>
+        <UTable
+          :data="data.latestClaims ?? []"
+          :columns="claimColumns"
+          class="w-full"
+          :ui="{
+            base: 'table-fixed border-separate border-spacing-0',
+            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+            tbody: '[&>tr]:last:[&>td]:border-b-0',
+            th: 'first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+            td: 'border-b border-default'
+          }"
+        />
+      </template>
+
+      <template #reviews>
+        <UTable
+          :data="data.recentReviewActivity ?? []"
+          :columns="reviewColumns"
+          class="w-full"
+          :ui="{
+            base: 'table-fixed border-separate border-spacing-0',
+            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+            tbody: '[&>tr]:last:[&>td]:border-b-0',
+            th: 'first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+            td: 'border-b border-default'
+          }"
+        />
+      </template>
+
+      <template #vendor>
+        <UTable
+          :data="data.pendingVendorClaimItems ?? []"
+          :columns="vendorColumns"
+          class="w-full"
+          :ui="{
+            base: 'table-fixed border-separate border-spacing-0',
+            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+            tbody: '[&>tr]:last:[&>td]:border-b-0',
+            th: 'first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+            td: 'border-b border-default'
+          }"
+        />
+      </template>
+    </UTabs>
+  </UCard>
 </template>

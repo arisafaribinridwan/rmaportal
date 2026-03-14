@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, format } from 'date-fns'
+import { format } from 'date-fns'
 import { VisXYContainer, VisLine, VisAxis, VisArea, VisCrosshair, VisTooltip } from '@unovis/vue'
 import type { Period, Range } from '~/types'
 
@@ -10,41 +10,47 @@ const props = defineProps<{
   range: Range
 }>()
 
-type DataRecord = {
-  date: Date
-  amount: number
+type TrendRecord = {
+  date: string
+  submitted: number
+  approved: number
 }
 
 const { width } = useElementSize(cardRef)
 
-const data = ref<DataRecord[]>([])
+const { data } = await useFetch<TrendRecord[]>('/api/dashboard/trend', {
+  query: computed(() => ({
+    start: props.range.start.toISOString(),
+    end: props.range.end.toISOString(),
+    period: props.period
+  })),
+  watch: [() => props.period, () => props.range],
+  default: () => []
+})
 
-watch([() => props.period, () => props.range], () => {
-  const dates = ({
-    daily: eachDayOfInterval,
-    weekly: eachWeekOfInterval,
-    monthly: eachMonthOfInterval
-  } as Record<Period, typeof eachDayOfInterval>)[props.period](props.range)
+const x = (_: TrendRecord, i: number) => i
+const y = [
+  (d: TrendRecord) => d.submitted,
+  (d: TrendRecord) => d.approved
+]
 
-  const min = 1000
-  const max = 10000
+const totalClaims = computed(() => data.value?.reduce((acc: number, cur: TrendRecord) => acc + cur.submitted + cur.approved, 0) ?? 0)
 
-  data.value = dates.map(date => ({ date, amount: Math.floor(Math.random() * (max - min + 1)) + min }))
-}, { immediate: true })
+const formatNumber = new Intl.NumberFormat('en', { maximumFractionDigits: 0 }).format
 
-const x = (_: DataRecord, i: number) => i
-const y = (d: DataRecord) => d.amount
-
-const total = computed(() => data.value.reduce((acc: number, { amount }) => acc + amount, 0))
-
-const formatNumber = new Intl.NumberFormat('en', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format
-
-const formatDate = (date: Date): string => {
-  return ({
-    daily: format(date, 'd MMM'),
-    weekly: format(date, 'd MMM'),
-    monthly: format(date, 'MMM yyy')
-  })[props.period]
+const formatDate = (dateString: string): string => {
+  // If period is monthly, dateString is YYYY-MM
+  // If period is weekly, dateString is YYYY-WW
+  // If period is daily, dateString is YYYY-MM-DD
+  if (props.period === 'monthly' && dateString.length === 7) {
+    const d = new Date(`${dateString}-01`)
+    return format(d, 'MMM yyyy')
+  }
+  if (props.period === 'daily' && dateString.length === 10) {
+    const d = new Date(dateString)
+    return format(d, 'd MMM')
+  }
+  return dateString
 }
 
 const xTicks = (i: number) => {
@@ -55,7 +61,7 @@ const xTicks = (i: number) => {
   return formatDate(data.value[i].date)
 }
 
-const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amount)}`
+const template = (d: TrendRecord) => `${formatDate(d.date)}<br/>Submitted: ${formatNumber(d.submitted)}<br/>Approved: ${formatNumber(d.approved)}`
 </script>
 
 <template>
@@ -63,10 +69,10 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
     <template #header>
       <div>
         <p class="text-xs text-muted uppercase mb-1.5">
-          Revenue
+          RMA Claim Trend
         </p>
         <p class="text-3xl text-highlighted font-semibold">
-          {{ formatNumber(total) }}
+          {{ formatNumber(totalClaims) }}
         </p>
       </div>
     </template>
@@ -80,12 +86,12 @@ const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amo
       <VisLine
         :x="x"
         :y="y"
-        color="var(--ui-primary)"
+        :color="['var(--ui-primary)', 'var(--ui-success)']"
       />
       <VisArea
         :x="x"
         :y="y"
-        color="var(--ui-primary)"
+        :color="['var(--ui-primary)', 'var(--ui-success)']"
         :opacity="0.1"
       />
 
