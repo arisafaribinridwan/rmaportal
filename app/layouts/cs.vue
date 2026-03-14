@@ -28,7 +28,7 @@ const dropdownItems = computed<DropdownMenuItem[][]>(() => [
     icon: 'i-lucide-log-out',
     onSelect: async () => {
       await authClient.signOut()
-      await navigateTo('/login', { replace: true })
+      window.location.href = '/login'
     }
   }]
 ])

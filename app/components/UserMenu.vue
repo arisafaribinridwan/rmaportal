@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
-import { authClient } from '~/utils/auth-client'
 import { useAuth } from '~/composables/useAuth'
 
 defineProps<{
@@ -8,7 +7,7 @@ defineProps<{
 }>()
 
 const colorMode = useColorMode()
-const { user } = useAuth()
+const { user, signOut } = useAuth()
 
 const displayName = computed(() => user.value?.name ?? 'User')
 
@@ -48,10 +47,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
 }], [{
   label: 'Log out',
   icon: 'i-lucide-log-out',
-  onSelect: async () => {
-    await authClient.signOut()
-    await navigateTo('/login', { replace: true })
-  }
+  onSelect: () => signOut()
 }]]))
 </script>
 
