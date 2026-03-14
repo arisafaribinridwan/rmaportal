@@ -41,8 +41,7 @@ export function useAuth() {
     try {
       await authClient.signOut()
       await navigateTo('/login', { replace: true })
-    }
-    finally {
+    } finally {
       // Reset flag setelah navigasi — state session better-auth
       // sudah benar di halaman /login
       isSigningOut.value = false

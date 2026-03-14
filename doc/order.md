@@ -1,48 +1,34 @@
-- [/] **#30** Dashboard Overview & Statistik — Chart unovis `app/pages/dashboard/index.vue`
-  - Module page: `app/pages/dashboard/index.vue`
-  - Module komponen: `app/components/home/HomeStats.vue`, `app/components/home/HomeChart.server.vue`, `app/components/home/HomeChart.client.vue`, `app/components/home/HomeSales.vue`
-  - Status saat ini: shell dashboard dan komponen statistik sudah ada, tapi masih template generik
-  - Keputusan MVP:
-    - KPI: `Submitted`, `Need Revision`, `Approved`, `Vendor Claim Pending`, `Total Claims`
-    - `Vendor Claim Pending`: item/vendor claim yang sudah dibatch dan masih menunggu keputusan vendor
-    - Chart utama: tren `Submitted` + `Approved`
-    - Filter `date range` + `period` hanya untuk KPI dan chart
-    - Tabel bawah: 1 card dengan tabs `Latest Claims`, `Recent Review Activity`, `Pending Vendor Claim Items`
-    - Setiap tab tampil maksimal 5 item terbaru
-    - Dashboard sama untuk semua role yang dapat akses `/dashboard`
-  - Implementasi teknis sederhana per file:
-    - `app/pages/dashboard/index.vue`
-      - Ubah title/header ke konteks dashboard RMA
-      - Hapus shortcut/action generik yang tidak relevan
-      - Pertahankan filter periode untuk KPI + chart
-    - `app/components/home/HomeStats.vue`
-      - Ganti data dummy ke summary KPI RMA dari backend
-      - Pertahankan pola card + variation seperti template saat ini
-    - `app/components/home/HomeChart.server.vue`
-      - Ubah placeholder/header dari revenue ke tren claim RMA
-    - `app/components/home/HomeChart.client.vue`
-      - Ganti data random ke data trend aktual
-      - Ubah chart menjadi 2 seri: `Submitted` dan `Approved`
-      - Ubah tooltip/label dari currency ke jumlah claim
-    - `app/components/home/HomeSales.vue`
-      - Ganti tabel sales dummy menjadi card bertab
-      - Isi tab: `Latest Claims`, `Recent Review Activity`, `Pending Vendor Claim Items`
-    - `server/api/dashboard/summary.get.ts`
-      - Endpoint KPI dashboard dengan filter range/period
-    - `server/api/dashboard/trend.get.ts`
-      - Endpoint trend dashboard untuk seri `Submitted` + `Approved`
-    - `server/api/dashboard/latest.get.ts`
-      - Endpoint data latest untuk 3 tab dashboard
-    - `server/services/dashboard.service.ts`
-      - Service agregasi data summary, trend, dan latest tabs
-    - `server/repositories/claim.repo.ts`
-      - Helper query KPI claim, trend claim, latest claims, recent review activity
-    - `server/repositories/vendor-claim.repo.ts`
-      - Helper query pending vendor claim items terbaru
-  - Checklist teknis lanjutan:
-    - Ganti source data dummy/template ke data RMA aktual
-    - Sesuaikan label, chart, dan cards agar domain-specific
-    - Hapus shortcut/action dashboard yang tidak relevan dengan RMA
-    - Tambahkan endpoint backend khusus dashboard
-    - Pastikan loading state dan empty state tersedia
-
+- [ ] **#31** Reports (Backend & Frontend) — Laporan + export `app/pages/dashboard/reports.vue`
+  - Module target backend: endpoint report summary/detail/export
+  - Module target frontend: `app/pages/dashboard/reports.vue`
+  - Status saat ini: menu reports dan role access sudah tersedia, tetapi file page reports dan endpoint backend belum ada
+  - Keputusan MVP yang sudah disepakati:
+    - Jenis laporan prioritas: `Claim Status Report`
+    - Output MVP: summary cards + detail table + export
+    - Format export MVP: `CSV`
+    - Filter MVP: `dateFrom`, `dateTo`, `status`, `vendorId`, `branch`
+    - Role akses MVP: `QRCC`, `MANAGEMENT`, `ADMIN`
+  - Breakdown implementasi per file/folder:
+    - Backend repository: buat `server/repositories/report.repo.ts`
+    - Backend service: buat `server/services/report.service.ts`
+    - Backend API summary: buat `server/api/reports/claims/summary.get.ts`
+    - Backend API detail: buat `server/api/reports/claims/detail.get.ts`
+    - Backend API export: buat `server/api/reports/claims/export.get.ts`
+    - Frontend page: buat `app/pages/dashboard/reports.vue`
+  - Tanggung jawab implementasi backend:
+    - Bangun query report berbasis tabel `claim` dengan join vendor, model, notification, dan defect
+    - Sediakan summary count per status: `DRAFT`, `SUBMITTED`, `IN_REVIEW`, `NEED_REVISION`, `APPROVED`, `ARCHIVED`
+    - Sediakan endpoint detail report dengan pagination dan filter aktif
+    - Sediakan export CSV yang mengikuti filter aktif
+    - Sediakan source filter vendor/branch yang aman untuk role `MANAGEMENT` tanpa bergantung ke endpoint master data
+  - Tanggung jawab implementasi frontend:
+    - Siapkan page reports dengan filter bar, summary cards, detail table, dan tombol export CSV
+    - Hubungkan filter ke endpoint summary dan detail
+    - Gunakan state default periode yang aman untuk MVP (rekomendasi: 30 hari terakhir)
+    - Tampilkan loading state, empty state, dan error state
+  - Acceptance criteria MVP:
+    - User role `QRCC`, `MANAGEMENT`, dan `ADMIN` dapat mengakses `/dashboard/reports`
+    - User dapat memfilter report berdasarkan periode, status, vendor, dan branch
+    - Summary dan detail table berubah sesuai filter aktif
+    - Export menghasilkan file CSV sesuai filter aktif
+    - Halaman tetap usable saat data kosong

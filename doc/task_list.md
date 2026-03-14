@@ -310,7 +310,7 @@
     - Pastikan hanya Admin yang bisa mutate user
     - Ganti page template members menjadi flow user management RMA
 
-- [/] **#30** Dashboard Overview & Statistik — Chart unovis `app/pages/dashboard/index.vue`
+- [x] **#30** Dashboard Overview & Statistik — Chart unovis `app/pages/dashboard/index.vue`
   - Module page: `app/pages/dashboard/index.vue`
   - Module komponen: `app/components/home/HomeStats.vue`, `app/components/home/HomeChart.server.vue`, `app/components/home/HomeChart.client.vue`, `app/components/home/HomeSales.vue`
   - Status saat ini: shell dashboard dan komponen statistik sudah ada, tapi masih template generik

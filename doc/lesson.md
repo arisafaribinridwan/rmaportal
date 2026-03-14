@@ -83,3 +83,51 @@ navigateTo('/login')
 > Ketika library pihak ketiga (seperti better-auth) tidak menjamin reactive state ter-update secara sinkron setelah operasi async, gunakan **module-level ref sebagai "optimistic flag"** untuk memastikan semua computed yang bergantung padanya langsung ter-invalidasi sebelum navigasi client-side dijalankan.
 
 Ini pola yang umum untuk menghindari race condition antara async state update library eksternal dan Nuxt route middleware.
+
+---
+
+## 2. Scope Filter Reports Harus Dipaksa di Backend (Bukan Hanya UI)
+
+**Tanggal:** 2026-03-14
+**File terkait:**
+- [server/services/report.service.ts](../server/services/report.service.ts)
+- [server/api/reports/claims/summary.get.ts](../server/api/reports/claims/summary.get.ts)
+- [server/api/reports/claims/detail.get.ts](../server/api/reports/claims/detail.get.ts)
+- [server/api/reports/claims/export.get.ts](../server/api/reports/claims/export.get.ts)
+- [server/api/reports/claims/filters.get.ts](../server/api/reports/claims/filters.get.ts)
+
+### Masalah
+
+Pada fitur Reports, role `MANAGEMENT` hanya boleh melihat data sesuai `branch` miliknya. Jika pembatasan ini hanya diterapkan di frontend (misalnya branch dropdown dikunci), user masih bisa mengubah query manual (`?branch=...`) langsung ke endpoint API.
+
+Artinya, pembatasan berbasis UI saja tidak cukup untuk menjamin data isolation antar-branch.
+
+### Solusi
+
+Tambahkan layer **scoping filter di service backend** agar semua endpoint report (`summary`, `detail`, `export`, dan `filters`) memakai aturan akses yang sama.
+
+Implementasi di `report.service.ts`:
+
+```ts
+function resolveScopedFilters(raw, scope) {
+  const filters = parseFilters(raw)
+
+  if (scope?.role === 'MANAGEMENT') {
+    if (!scope.branch?.trim()) {
+      throw createError({ statusCode: 403 })
+    }
+
+    filters.branch = scope.branch.trim() // force override
+  }
+
+  return filters
+}
+```
+
+Semua handler API report mengirim `role` + `branch` dari `event.context.auth.user` ke service, sehingga rule ini selalu aktif terlepas dari source request (UI, curl, Postman, dll).
+
+### Key Takeaway
+
+> Rule akses data yang bersifat security/authorization harus dipaksa di backend service layer. Frontend boleh membantu UX (menyembunyikan/mengunci filter), tetapi tidak boleh menjadi satu-satunya pengaman.
+
+Dengan pola ini, kita mendapat enforcement yang konsisten untuk semua endpoint report sekaligus mengurangi risiko data leakage karena query tampering.
