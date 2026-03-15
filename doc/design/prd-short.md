@@ -96,6 +96,7 @@ Design requirements:
   - amber for revision/attention needed
   - green for approved/verified/completed
   - red for rejected/destructive
+- Ligth theme first
 
 Visual direction:
 - Internal enterprise operations platform.
